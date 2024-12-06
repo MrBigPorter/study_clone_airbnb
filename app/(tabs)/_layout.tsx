@@ -67,7 +67,7 @@ const TabLayout = () => {
         />
         {/* 消息标签页 Messages Tab */}
         <Tabs.Screen 
-          name='massages' 
+          name='messages' 
           options={{
             headerShown:false,
             tabBarIcon:({color,size})=>(
