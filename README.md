@@ -1,51 +1,54 @@
-# Airbnb Clone Study Project
+# Airbnb Clone Mobile App
 
-⚠️ DISCLAIMER: This is a study project for educational purposes only. Not for commercial use. Use at your own risk.
+⚠️ DISCLAIMER: This project is for educational purposes only. Not for commercial use.
 
-A React Native project aimed at learning mobile app development by recreating the Airbnb app interface and functionality. This project is created solely for learning and practicing React Native development skills.
+A React Native mobile application that recreates core features of the Airbnb platform. Built as a learning project to explore and practice modern mobile development techniques.
 
-## Project Overview
+## About This Project
 
-This is an educational project focused on:
-- Building a modern mobile app UI with React Native
-- Implementing key Airbnb features and interactions
-- Learning React Native best practices and patterns
-- Understanding mobile app architecture and state management
+This educational project focuses on implementing:
+- A polished mobile user interface using React Native
+- Core booking and property listing functionality 
+- Modern app architecture and state management patterns
+- Industry best practices for mobile development
 
-## Important Notice
+## Legal Notice
 
-This project:
-- Is NOT affiliated with Airbnb
-- Should NOT be used for commercial purposes
-- Is intended ONLY for educational and learning purposes
-- May contain bugs and incomplete features
-- Comes with NO WARRANTY of any kind
+Please note that this project:
+- Has no affiliation with Airbnb
+- Is strictly for learning purposes
+- Cannot be used commercially
+- Is provided as-is without warranties
+- May have incomplete features
 
-## Tech Stack
+## Technology Stack
 
-- React Native
-- JavaScript/TypeScript
-- Navigation
-- State Management
-- UI Components
+The project utilizes:
+- React Native framework
+- TypeScript/JavaScript
+- React Navigation
+- State management solutions
+- Custom UI component library
 
-## Features to Implement
+## Planned Features
 
-- [ ] User authentication
-- [ ] Property listings and search
-- [ ] Booking system
-- [ ] User profiles
-- [ ] Reviews and ratings
-- [ ] Messaging system
+The following features are in development:
+- [ ] User signup and authentication
+- [ ] Property search and listings
+- [ ] Booking and reservation system  
+- [ ] User profile management
+- [ ] Property reviews and ratings
+- [ ] In-app messaging
 
-## Getting Started
+## Development Setup
 
-Instructions for setting up and running the project will be added as development progresses.
+Detailed setup instructions and environment configuration steps will be documented as the project develops.
 
-## Learning Goals
+## Educational Objectives
 
-- Master React Native fundamentals
-- Understand mobile UI/UX principles
-- Learn app state management
-- Practice modern JavaScript/TypeScript
-- Implement real-world app features
+Key learning goals include:
+- Building proficiency with React Native
+- Understanding mobile app design principles
+- Implementing complex state management
+- Writing clean, maintainable TypeScript/JavaScript
+- Developing production-quality features

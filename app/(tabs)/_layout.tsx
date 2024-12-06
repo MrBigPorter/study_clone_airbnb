@@ -1,6 +1,6 @@
+import { Colors } from "@/constants/Colors";
 import { FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { Colors } from "@/constants/Colors";
 
 /**
  * TabLayout组件 - 定义底部标签页导航的布局和样式
