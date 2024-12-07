@@ -37,9 +37,10 @@ const TabLayout = () => {
       >
         {/* 搜索标签页 Search Tab */}
         <Tabs.Screen 
-          name='index'
+          name="index"
           options={{
             headerShown: false,
+            tabBarLabel: "Eplore",
             tabBarIcon: ({color, size}) => (
               <Ionicons name='search' color={color} size={size} />
             ),
@@ -47,9 +48,10 @@ const TabLayout = () => {
         />
         {/* 愿望清单标签页 Wishlists Tab */}
         <Tabs.Screen 
-          name='wishlists'
+          name="wishlists"
           options={{
             headerShown:false,
+            tabBarLabel: "Wishlists",
             tabBarIcon:({color,size})=>(
               <Ionicons name="heart-outline" color={color} size={size} />
             )
@@ -57,9 +59,10 @@ const TabLayout = () => {
         />
         {/* 行程标签页 Trips Tab */}
         <Tabs.Screen 
-          name='trips'
+          name="trips"
           options={{
             headerShown:false,
+            tabBarLabel: "Trips",
             tabBarIcon:({color,size})=>(
               <FontAwesome5 name='airbnb' color={color} size={size} />
             )
@@ -67,9 +70,10 @@ const TabLayout = () => {
         />
         {/* 消息标签页 Messages Tab */}
         <Tabs.Screen 
-          name='messages' 
+          name="messages"
           options={{
             headerShown:false,
+            tabBarLabel: "Messages",
             tabBarIcon:({color,size})=>(
               <MaterialCommunityIcons name="message-outline" color={color} size={size} />
             )
@@ -77,9 +81,10 @@ const TabLayout = () => {
         />
         {/* 个人资料标签页 Profile Tab */}
         <Tabs.Screen 
-          name='profile'
+          name="profile"
           options={{
             headerShown:false,
+            tabBarLabel: "Profile",
             tabBarIcon:({color,size})=>(
               <Ionicons name='person-circle-outline' color={color} size={size} />
             )
