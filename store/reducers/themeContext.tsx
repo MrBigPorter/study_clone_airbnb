@@ -20,7 +20,7 @@ export const ThemeProvider:React.FC<ThemeProviderProps>= ({children,defaultTheme
     const [themeMode,setThemeMode] = useState<ThemeMode>(defaultTheme);
     const loadTheme = async()=>{
         try {
-            const savedTheme = AsyncS
+          
         } catch (error) {
             
         }

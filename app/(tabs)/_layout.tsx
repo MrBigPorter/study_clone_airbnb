@@ -1,5 +1,6 @@
 import { FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { Platform } from "react-native";
 
 /**
  * TabLayout组件 - 定义底部标签页导航的布局和样式
@@ -13,7 +14,9 @@ const TabLayout = () => {
           // Set tab bar styles including background color and height
           tabBarStyle: {
             backgroundColor: "#fff",
-            height: 62.5,
+            height: Platform.OS === 'ios' ? 80 : 58,
+            paddingBottom: Platform.OS === 'ios' ? 30 : 8,
+            paddingTop: Platform.OS === 'ios' ? 8 : 4,
           },
           // 设置激活和未激活状态下的标签颜色
           // Set colors for active and inactive tab states
@@ -28,9 +31,10 @@ const TabLayout = () => {
           // 设置标签文本的样式，包括字体大小、粗细和字体族
           // Set tab label styles including font size, weight and family
           tabBarLabelStyle: {
-            fontSize: 14,
-            fontWeight: "500",
+            fontSize: Platform.OS === 'ios' ? 14 : 12,
+            fontWeight: Platform.OS === 'ios' ? "500" : "bold",
             fontFamily: "mon-sb",
+            paddingBottom: Platform.OS === 'ios' ? 0 : 4,
           }
         }}
       >
@@ -41,7 +45,7 @@ const TabLayout = () => {
             headerShown: false,
             tabBarLabel: "Eplore",
             tabBarIcon: ({color, size}) => (
-              <Ionicons name='search' color={color} size={size} />
+              <Ionicons name='search' color={color} size={Platform.OS === 'ios' ? size : size - 2} />
             ),
           }}
         />
@@ -52,7 +56,7 @@ const TabLayout = () => {
             headerShown:false,
             tabBarLabel: "Wishlists",
             tabBarIcon:({color,size})=>(
-              <Ionicons name="heart-outline" color={color} size={size} />
+              <Ionicons name="heart-outline" color={color} size={Platform.OS === 'ios' ? size : size - 2} />
             )
           }}
         />
@@ -63,7 +67,7 @@ const TabLayout = () => {
             headerShown:false,
             tabBarLabel: "Trips",
             tabBarIcon:({color,size})=>(
-              <FontAwesome5 name='airbnb' color={color} size={size} />
+              <FontAwesome5 name='airbnb' color={color} size={Platform.OS === 'ios' ? size : size - 2} />
             )
           }}
         />
@@ -74,7 +78,7 @@ const TabLayout = () => {
             headerShown:false,
             tabBarLabel: "Messages",
             tabBarIcon:({color,size})=>(
-              <MaterialCommunityIcons name="message-outline" color={color} size={size} />
+              <MaterialCommunityIcons name="message-outline" color={color} size={Platform.OS === 'ios' ? size : size - 2} />
             )
           }}
         />
@@ -85,7 +89,7 @@ const TabLayout = () => {
             headerShown:false,
             tabBarLabel: "Profile",
             tabBarIcon:({color,size})=>(
-              <Ionicons name='person-circle-outline' color={color} size={size} />
+              <Ionicons name='person-circle-outline' color={color} size={Platform.OS === 'ios' ? size : size - 2} />
             )
           }}
         />
@@ -93,4 +97,3 @@ const TabLayout = () => {
     )
 } 
 export default TabLayout;
-
