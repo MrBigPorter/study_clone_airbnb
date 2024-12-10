@@ -3,11 +3,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-if (__DEV__) {
-  import('react-native-flipper').then(() => {
-    // Flipper 已加载
-  });
-}
+
 // 防止启动屏幕自动隐藏
 SplashScreen.preventAutoHideAsync();
 

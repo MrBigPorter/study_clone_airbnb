@@ -1,4 +1,3 @@
-import { Colors } from "@/constants/Colors";
 import { FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
@@ -13,7 +12,7 @@ const TabLayout = () => {
           // 设置标签栏的样式，包括背景色和高度
           // Set tab bar styles including background color and height
           tabBarStyle: {
-            backgroundColor: Colors.primary,
+            backgroundColor: "#fff",
             height: 62.5,
           },
           // 设置激活和未激活状态下的标签颜色
