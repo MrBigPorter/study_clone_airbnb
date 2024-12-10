@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@/store/reducers/themeContext';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -35,7 +36,7 @@ export default function RootLayout() {
 
   // 返回Stack导航组件 Return Stack navigation component
   return (
-    <NativeBaseProvider>
+    <ThemeProvider>
       <Stack
         // 设置所有页面的默认配置 Set default options for all screens
         screenOptions={{
@@ -55,6 +56,6 @@ export default function RootLayout() {
           }}
         />
       </Stack>
-    </NativeBaseProvider>
+    </ThemeProvider>
   );
 }

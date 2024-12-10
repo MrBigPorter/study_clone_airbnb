@@ -19,7 +19,7 @@ const tokens = {
       600: '#e31c5f',   // 较深主色调 / Darker primary shade
       700: '#c4092f',   // 深色主色调 / Deep primary shade
       800: '#a00d2a',   // 非常深的主色调 / Very deep primary shade
-      900: '#7d0d23',   // 最深的主色调 / Deepest primary shade
+      900: 'red',   // 最深的主色调 / Deepest primary shade
     },
     gray: {
       50: '#f7f7f7',    // 最浅的灰色 / Lightest gray
