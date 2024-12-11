@@ -1,6 +1,8 @@
 // 导入主题相关依赖 / Import theme-related dependencies
 import { Theme, themes } from '@/styles/theme';
 import { createContext, useContext, useState } from 'react';
+import { NativeBaseProvider } from 'native-base';
+
 // 主题模式类型定义 / Theme mode type definition
 export type ThemeMode = 'light' | 'dark';
 
@@ -32,7 +34,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   // 返回包含主题上下文提供者的组件 / Return component with theme context provider
   return (
     <ThemeContext.Provider value={{ theme: themes[theme], toggleTheme }}>
-      {children}
+      <NativeBaseProvider>
+        {children}
+      </NativeBaseProvider>
     </ThemeContext.Provider>
   );
 };
