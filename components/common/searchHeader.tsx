@@ -8,38 +8,51 @@ import {
   Platform,
   TouchableOpacity,
   Pressable,
+  TouchableHighlight,
 } from 'react-native';
 // 导入Ionicons图标
 // Import Ionicons icons
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Box, Button } from 'native-base';
-import { ScaledSheet } from 'react-native-size-matters';
+import { Box} from 'native-base';
+import { useState } from 'react';
 
 // 搜索头部组件
 // Search header component
 export default function SearchHeader() {
+  const [isPressed, setIsPressed] = useState<boolean>(false);
+
+  const filterPress = (isPressed: boolean) => {
+    setIsPressed(isPressed);
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* 搜索栏按钮 Search bar button */}
+
       <View style={styles.searchBar}>
-          <Box style={styles.searchContentWrapper} shadow={4}>
-            <Ionicons name="search" size={24} color="black" />
-            <View style={styles.searchTitleWrap}>
-              <Text style={styles.searchTitle}>Where to?</Text>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
-                style={styles.searchSubtitle}
-              >
-                Anywhere • Any week • Add guests
-              </Text>
-            </View>
-          </Box>
+        <Box style={styles.searchContentWrapper} shadow={6}>
+          <Ionicons name="search" size={24} color="black" />
+          <View style={styles.searchTitleWrap}>
+            <Text style={styles.searchTitle}>Where to?</Text>
+            <Text
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={styles.searchSubtitle}
+            >
+              Anywhere • Any week • Add guests
+            </Text>
+          </View>
+        </Box>
 
         {/* 筛选按钮 Filter button */}
-        <TouchableOpacity style={styles.filterButton} activeOpacity={0.8}>
-          <Ionicons name="options" size={24} color="black" />
-        </TouchableOpacity>
+        <Pressable      
+             style={styles.filterButton} 
+             onPressIn={()=>filterPress(true)}
+             onPressOut={()=>filterPress(false)}
+            >
+          <View style={isPressed && styles.activeFilter} >
+            <Ionicons name="options" size={24} color="black" />
+          </View>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -47,7 +60,7 @@ export default function SearchHeader() {
 
 // 样式定义
 // Style definitions
-const styles = ScaledSheet.create({
+const styles = StyleSheet.create({
   // 安全区域样式
   // Safe area style
   safeArea: {
@@ -69,7 +82,7 @@ const styles = ScaledSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    height: '54@vs',
+    height: 54,
     padding: 12,
     backgroundColor: '#fff',
     borderRadius: 32,
@@ -111,16 +124,13 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgb(176, 176, 176)',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+  },
+  activeFilter: {
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    borderRadius: '50%',
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

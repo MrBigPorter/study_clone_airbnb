@@ -14,7 +14,7 @@ export default function ExloreList() {
         </View>
         {/* title */}
         <View style={styles.ListTitleWrap}>
-          <Text style={styles.ListTitleLeftText}>
+          <Text style={[styles.ListTitleLeftText, { color: 'primary.900' }]}>
             Khet Khlong Toei, Thailand
           </Text>
           <View style={styles.ListTitleRight}>
@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
   ListTitleLeftText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: 'primary.900',
   },
   ListTitleRightText: {
     fontSize: 16,

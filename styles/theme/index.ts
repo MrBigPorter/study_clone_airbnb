@@ -33,5 +33,3 @@ export const themes = {
   light: createTheme(lightTheme),
   dark: createTheme(darkTheme),
 };
-  // 导出主题相关内容 Export theme-related contents
-export { lightTheme, darkTheme, tokens };

@@ -1,8 +1,7 @@
-import { ThemeProvider } from '@/store/reducers/themeContext';
+import { ThemeProvider } from '@/context/themeContext';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { NativeBaseProvider } from 'native-base';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
