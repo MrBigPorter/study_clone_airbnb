@@ -1,4 +1,9 @@
-import { useRef, useState } from 'react';
+// CategoryList Component - 分类列表组件
+// Displays a horizontal scrollable list of categories with icons and names
+// 显示一个带有图标和名称的水平可滚动分类列表
+
+import { useCustomTheme } from '@/context/themeContext';
+import { useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,17 +12,21 @@ import {
   Image,
   TouchableOpacity,
   LayoutChangeEvent,
-  LayoutRectangle,
 } from 'react-native';
+
+// Types definitions - 类型定义
 type Category = {
   id: number;
   name: string;
   icon: any;
 };
+
 type CategoryWidths = {
   id: number;
   width: number;
 };
+
+// Category data array - 分类数据数组
 const categories: Category[] = [
   {
     id: 1,
@@ -26,7 +35,7 @@ const categories: Category[] = [
   },
   {
     id: 3,
-    name: 'CountrySide',
+    name: 'CountrySide', 
     icon: require('@/assets/images/home/category/countrySide.jpg'),
   },
   {
@@ -82,66 +91,90 @@ const categories: Category[] = [
 ];
 
 export default function CategoryList() {
-  // State to track the currently selected category, initialized with first category
+  // State management - 状态管理
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
-  // State to store width measurements of each category item
   const [categoryWidths, setCategoryWidths] = useState<CategoryWidths[]>([]);
-
   const scrollViewRef = useRef<ScrollView>(null);
+  const { theme: { text, background } } = useCustomTheme();
 
-  // Handler for when a category is pressed/selected
-  const onCategoryPress = (index:number,category: Category) => {
+  // Handle category selection and scroll - 处理分类选择和滚动
+  const onCategoryPress = useCallback((index: number, category: Category) => {
     setSelectedCategory(category);
-    const xPosition = categoryWidths.slice(0,index).reduce((acc,item)=>acc+item.width,0);
-    console.log('xPosition',xPosition)    
+    const xPosition = categoryWidths
+      .slice(0, index)
+      .reduce((acc, item) => acc + item.width, 0);
     scrollViewRef.current?.scrollTo({
-      x:xPosition,
-      animated:true
-    })
-  };
+      x: xPosition,
+      animated: true
+    });
+  }, [categoryWidths]);
 
-  // Handler to measure and store the width of each category item as it is laid out
-  const onCategoryLayout = (id: number) => (event: LayoutChangeEvent) => {
-    const { width } = event.nativeEvent?.layout;
-    setCategoryWidths((prev) => [...prev, { id, width }]);
-  };
+  // Handle category layout measurement - 处理分类布局测量
+  const onCategoryLayout = useCallback((id: number) => (event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setCategoryWidths(prev => {
+      const existing = prev.find(item => item.id === id);
+      if (existing) {
+        return prev.map(item => 
+          item.id === id ? { ...item, width } : item
+        );
+      }
+      return [...prev, { id, width }];
+    });
+  }, []);
 
+  // Render individual category item - 渲染单个分类项
+  const renderCategory = useCallback(({ category, index }: { category: Category, index: number }) => (
+    <TouchableOpacity
+      onPress={() => onCategoryPress(index, category)}
+      onLayout={onCategoryLayout(category.id)}
+      key={category.id}
+      style={[
+        styles.categoryItemWrapper,
+        index === 0 && styles.firstItem,
+        selectedCategory.id === category.id && styles.categoryActive,
+      ]}
+    >
+      <View style={styles.categoryItem}>
+        <Image
+          source={category.icon}
+          style={[
+            styles.categoryIcon,
+            selectedCategory.id === category.id && styles.categoryActiveIcon
+          ]}
+          resizeMode="contain"
+        />
+        <Text 
+          style={[
+            styles.categoryName,
+            {color:text.secondary},
+            selectedCategory.id === category.id && styles.categoryActiveName,
+            { color: text.primary }
+          ]}
+        >
+          {category.name}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  ), [selectedCategory.id, onCategoryPress, onCategoryLayout, text.primary]);
+
+  // Main render - 主渲染
   return (
     <ScrollView
       ref={scrollViewRef}
-      horizontal={true}
+      horizontal
       showsHorizontalScrollIndicator={false}
-      style={styles.categoryList}
+      style={{ backgroundColor: background.default }}
     >
       {categories.map((category, index) => (
-        <TouchableOpacity
-          onPress={() => onCategoryPress(index,category)}
-          onLayout={onCategoryLayout(category.id)}
-          key={category.id}
-          style={[
-            styles.categoryItemWrapper,
-            index === 0 && styles.firstItem,
-            selectedCategory.id === category.id && styles.categoryActive,
-          ]}
-        >
-          <View style={styles.categoryItem}>
-            <Image
-              source={category.icon}
-              style={styles.categoryIcon}
-              resizeMode="contain"
-            />
-            <Text style={[styles.categoryName,selectedCategory.id === category.id && styles.categoryActiveName]}>{category.name}</Text>
-          </View>
-        </TouchableOpacity>
+        renderCategory({ category, index })
       ))}
     </ScrollView>
   );
 }
-const styles = StyleSheet.create({
-  categoryList: {
-    backgroundColor: '#fff',
 
-  },
+// Styles - 样式定义
+const styles = StyleSheet.create({
   categoryItemWrapper: {
     height: 74,
     flexDirection: 'row',
@@ -162,16 +195,18 @@ const styles = StyleSheet.create({
     borderBottomColor: '#000',
   },
   categoryActiveName: {
-    color: '#000',
-    fontWeight: 500,
+    fontWeight: '500',
   },
   categoryIcon: {
     height: 24,
     width: 24,
     marginBottom: 5,
+    opacity: 0.6
+  },
+  categoryActiveIcon: {
+    opacity: 1
   },
   categoryName: {
-    fontSize: 12,
-    color: '#333',
+    fontSize: 12
   },
 });

@@ -9,7 +9,7 @@ import { tokens } from './tokens';
 // Combines light/dark theme properties with design tokens
 // Theme type definition that combines theme colors and design tokens
 // 主题类型定义，结合了主题颜色和设计令牌
-export type Theme = typeof lightTheme | typeof darkTheme & {
+export type Theme = (typeof lightTheme | typeof darkTheme) & {
   // Includes all color definitions from lightTheme (primary, text, background, etc.)
   // 包含来自 lightTheme 的所有颜色定义（主色、文本、背景等）
 
