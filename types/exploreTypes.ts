@@ -7,4 +7,5 @@ interface ExploreItemType {
     image: string;
 }
 
+
 export type { ExploreItemType };
