@@ -42,7 +42,6 @@ const TabLayout = () => {
         <Tabs.Screen 
           name="index"
           options={{
-            headerShown: false,
             tabBarLabel: "Eplore",
             tabBarIcon: ({color, size}) => (
               <Ionicons name='search' color={color} size={Platform.OS === 'ios' ? size : size - 2} />

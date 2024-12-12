@@ -25,9 +25,6 @@ export default function SearchHeader() {
     setIsPressed(isPressed);
   };
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* 搜索栏按钮 Search bar button */}
-
       <View style={styles.searchBar}>
         <Box style={styles.searchContentWrapper} shadow={6}>
           <Ionicons name="search" size={24} color="black" />
@@ -54,19 +51,12 @@ export default function SearchHeader() {
           </View>
         </Pressable>
       </View>
-    </SafeAreaView>
   );
 }
 
 // 样式定义
 // Style definitions
 const styles = StyleSheet.create({
-  // 安全区域样式
-  // Safe area style
-  safeArea: {
-    backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'android' ? 25 : 0,
-  },
   // 搜索栏容器样式
   // Search bar container style
   searchBar: {
