@@ -1,7 +1,7 @@
-import {  ScrollView } from 'react-native';
 import ExploreItem from './ExploreItem';
 import { useState } from 'react';
 import { ExploreItemType } from '@/types/exploreTypes';
+import { ScrollView } from 'react-native';
 
 export default function ExploreList() {
   const [list, setList] = useState<ExploreItemType[]>([
@@ -57,16 +57,13 @@ export default function ExploreList() {
         require('@/assets/images/home/list/1.png'),
       ],
     },
-    
-
   ]);
 
   return (
-    <ScrollView style={{flex:1}} nestedScrollEnabled={true} >
-      {list.map((item) => (       
+    <ScrollView>
+      {list.map((item) => (
         <ExploreItem key={item.id} item={item} />
       ))}
     </ScrollView>
   );
 }
-
