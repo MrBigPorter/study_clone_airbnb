@@ -1,21 +1,11 @@
 // 导入所需的React Native组件
 // Import required React Native components
-import {
-  View,
-  Text,
-  SafeAreaView,
-  StyleSheet,
-  Platform,
-  TouchableOpacity,
-  Pressable,
-  TouchableHighlight,
-} from 'react-native';
+import { View, Text, StyleSheet, Platform, Pressable } from 'react-native';
 // 导入Ionicons图标
 // Import Ionicons icons
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Box} from 'native-base';
 import { useState } from 'react';
-
+import { Surface } from 'react-native-paper';
 // 搜索头部组件
 // Search header component
 export default function SearchHeader() {
@@ -25,32 +15,35 @@ export default function SearchHeader() {
     setIsPressed(isPressed);
   };
   return (
-      <View style={styles.searchBar}>
-        <Box style={styles.searchContentWrapper} shadow={6}>
-          <Ionicons name="search" size={24} color="black" />
-          <View style={styles.searchTitleWrap}>
-            <Text style={styles.searchTitle}>Where to?</Text>
-            <Text
-              numberOfLines={2}
-              ellipsizeMode="tail"
-              style={styles.searchSubtitle}
-            >
-              Anywhere • Any week • Add guests
-            </Text>
-          </View>
-        </Box>
+    <View style={styles.searchBar}>
+      <Surface
+        style={styles.searchContentWrapper}
+        elevation={Platform.OS === 'ios' ? 1 : 5}
+      >
+        <Ionicons name="search" size={24} color="black" />
+        <View style={styles.searchTitleWrap}>
+          <Text style={styles.searchTitle}>Where to?</Text>
+          <Text
+            numberOfLines={2}
+            ellipsizeMode="tail"
+            style={styles.searchSubtitle}
+          >
+            Anywhere • Any week • Add guests
+          </Text>
+        </View>
+      </Surface>
 
-        {/* 筛选按钮 Filter button */}
-        <Pressable      
-             style={styles.filterButton} 
-             onPressIn={()=>filterPress(true)}
-             onPressOut={()=>filterPress(false)}
-            >
-          <View style={isPressed && styles.activeFilter} >
-            <Ionicons name="options" size={24} color="black" />
-          </View>
-        </Pressable>
-      </View>
+      {/* 筛选按钮 Filter button */}
+      <Pressable
+        style={styles.filterButton}
+        onPressIn={() => filterPress(true)}
+        onPressOut={() => filterPress(false)}
+      >
+        <View style={isPressed && styles.activeFilter}>
+          <Ionicons name="options" size={24} color="black" />
+        </View>
+      </Pressable>
+    </View>
   );
 }
 
@@ -63,8 +56,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    margin: 16,
     backgroundColor: '#fff',
+    marginLeft: 24,
+    marginRight: 24,
+    marginBottom: 12,
   },
   // 搜索内容包装器样式
   // Search content wrapper style
@@ -78,6 +73,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     marginRight: 14,
     shadowRadius: 8,
+    boxSizing: 'border-box',
   },
   // 搜索标题包装器样式
   // Search title wrapper style

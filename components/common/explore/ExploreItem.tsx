@@ -9,6 +9,7 @@ import {
   Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Swiper from 'react-native-swiper';
 import { useCustomTheme } from '@/context/themeContext';
 import { ExploreItemType } from '@/types/exploreTypes';
 import { useState, useRef } from 'react';
@@ -35,7 +36,7 @@ export default function ExploreItem({ item }: { item: ExploreItemType }) {
 
   /**
    * 处理添加到收藏夹 Handle adding to wishlist
-   * @param item - 要添加/移除的项目 Item to add/remove
+   * @param item - 要添加/���除的项目 Item to add/remove
    */
   const handleAddToWishlist = (item: ExploreItemType) => {
     jump();
@@ -47,7 +48,7 @@ export default function ExploreItem({ item }: { item: ExploreItemType }) {
       setCurrentWishItem(item);
     }
   };
-  
+
   /**
    * 心形图标跳动动画 Heart icon jump animation
    */
@@ -72,8 +73,8 @@ export default function ExploreItem({ item }: { item: ExploreItemType }) {
     <TouchableOpacity
       activeOpacity={1}
       delayPressIn={50}
-      onPressIn={() => setIsItemPressed(true)}
-      onPressOut={() => setIsItemPressed(false)}
+      // onPressIn={() => setIsItemPressed(true)}
+      // onPressOut={() => setIsItemPressed(false)}
       style={{
         padding: 24,
         transform: [
@@ -84,11 +85,24 @@ export default function ExploreItem({ item }: { item: ExploreItemType }) {
       }}
     >
       {/* 图片区域 Image section */}
+      <Swiper
+        style={styles.wrapper}
+        showsButtons={true}
+        showsPagination={true}
+        paginationStyle={styles.pagination}
+        dotStyle={styles.dot}
+        activeDotStyle={styles.activeDot}
+      >
+        {item.images.map((image, index) => (
+          <View style={styles.slide} key={index}>
+            <Image source={image} 
+            style={styles.image}
+            />
+          </View>
+        ))}
+      </Swiper>
+
       <View>
-        <Image
-          style={styles.ListImage}
-          source={require('@/assets/images/home/list/1.png')}
-        />
         {/* 收藏按钮 Wishlist button */}
         <TouchableWithoutFeedback onPress={() => handleAddToWishlist(item)}>
           <Animated.View
@@ -198,4 +212,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  wrapper: {
+    height: 310,
+  },
+  pagination: {
+    bottom: 20,
+  },
+  dot: {
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginLeft: 3,
+    marginRight: 3,
+  },
+  activeDot: {
+    backgroundColor: '#fff',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  slide: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+  },
+  
 });

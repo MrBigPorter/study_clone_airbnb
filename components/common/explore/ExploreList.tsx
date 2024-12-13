@@ -12,6 +12,11 @@ export default function ExploreList() {
       date: 'Feb 1 – 6',
       price: '$82 night',
       image: require('@/assets/images/home/list/1.png'),
+      images: [
+        require('@/assets/images/home/list/1.png'),
+        require('@/assets/images/home/list/1.png'),
+        require('@/assets/images/home/list/1.png'),
+      ],
     },
     {
       id: 2,
@@ -20,6 +25,11 @@ export default function ExploreList() {
       date: 'Feb 1 – 6',
       price: '$82 night',
       image: require('@/assets/images/home/list/1.png'),
+      images: [
+        require('@/assets/images/home/list/1.png'),
+        require('@/assets/images/home/list/1.png'),
+        require('@/assets/images/home/list/1.png'),
+      ],
     },
     {
       id: 4,
@@ -28,6 +38,11 @@ export default function ExploreList() {
       date: 'Feb 1 – 6',
       price: '$82 night',
       image: require('@/assets/images/home/list/1.png'),
+      images: [
+        require('@/assets/images/home/list/1.png'),
+        require('@/assets/images/home/list/1.png'),
+        require('@/assets/images/home/list/1.png'),
+      ],
     },
     {
       id: 5,
@@ -36,13 +51,18 @@ export default function ExploreList() {
       date: 'Feb 1 – 6',
       price: '$82 night',
       image: require('@/assets/images/home/list/1.png'),
+      images: [
+        require('@/assets/images/home/list/1.png'),
+        require('@/assets/images/home/list/1.png'),
+        require('@/assets/images/home/list/1.png'),
+      ],
     },
     
 
   ]);
 
   return (
-    <ScrollView style={{flex:1}}>
+    <ScrollView style={{flex:1}} nestedScrollEnabled={true} >
       {list.map((item) => (       
         <ExploreItem key={item.id} item={item} />
       ))}

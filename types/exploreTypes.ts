@@ -5,6 +5,7 @@ interface ExploreItemType {
     date: string;
     price: string;
     image: string;
+    images: any[];
 }
 
 

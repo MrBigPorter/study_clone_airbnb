@@ -32,6 +32,6 @@ const styles = StyleSheet.create({
   // Safe area style
   safeArea: {
     backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'android' ? 25 : 0,
+    paddingTop: Platform.OS === 'android' ? 12 : 0,
   },
 })

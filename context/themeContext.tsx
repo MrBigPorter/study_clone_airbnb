@@ -1,8 +1,9 @@
 // 导入主题相关依赖 / Import theme-related dependencies
 import { Theme, themes } from '@/styles/theme';
 import { createContext, useContext, useState } from 'react';
-import { NativeBaseProvider } from 'native-base';
-
+import {
+  PaperProvider,
+} from 'react-native-paper';
 // 主题模式类型定义 / Theme mode type definition
 export type ThemeMode = 'light' | 'dark';
 
@@ -27,16 +28,16 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<ThemeMode>('light');
 
   // 切换主题的方法 / Method to toggle theme
-  const toggleTheme = (currentTheme: ThemeMode) => {
-    setTheme(currentTheme);
+  const toggleTheme = (theme: ThemeMode) => {
+    setTheme(theme);
   };
 
   // 返回包含主题上下文提供者的组件 / Return component with theme context provider
   return (
     <ThemeContext.Provider value={{ theme: themes[theme], toggleTheme }}>
-      <NativeBaseProvider>
+      <PaperProvider > 
         {children}
-      </NativeBaseProvider>
+      </PaperProvider>
     </ThemeContext.Provider>
   );
 };
