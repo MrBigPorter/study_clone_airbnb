@@ -256,6 +256,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     padding: 24,
+    position: 'relative',
   },
   // 轮播容器样式 Carousel container styles
   carouselContainer: {
@@ -305,7 +306,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
   },
   // 图片样式 Image styles
   image: {

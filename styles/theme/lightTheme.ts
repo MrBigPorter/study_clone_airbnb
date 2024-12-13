@@ -18,6 +18,7 @@ export const lightTheme = {
     paper:"#F7F7F7",    // Paper-like background for cards and surfaces
     secondary:"#F5F5F5", // Secondary background for contrast
     tertiary:"#EBEBEB",  // Tertiary background for additional contrast
+    contrast:"rgb(34, 34, 34)",  // Contrast background color
    },
    border:{
     default:"#DDDDDD",   // Default border color

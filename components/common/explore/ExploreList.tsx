@@ -1,9 +1,9 @@
 import ExploreItem from './ExploreItem';
 import { useState } from 'react';
-import { ExploreItemType } from '@/types/exploreTypes';
-import { ScrollView } from 'react-native';
+import { ExploreItemType, ExploreListProps } from '@/types/exploreTypes';
+import { FlatList, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
-export default function ExploreList() {
+export default function ExploreList({onScroll}:ExploreListProps) {
   const [list, setList] = useState<ExploreItemType[]>([
     {
       id: 1,
@@ -59,11 +59,19 @@ export default function ExploreList() {
     },
   ]);
 
+  // 处理滚动事件 Handle scroll events
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    onScroll && onScroll(event);
+  };
+
   return (
-    <ScrollView>
-      {list.map((item) => (
-        <ExploreItem key={item.id} item={item} />
-      ))}
-    </ScrollView>
+    <FlatList 
+      data={list}
+      renderItem={({ item }) => <ExploreItem key={item.id} item={item} />}
+      keyExtractor={(item) => item.id.toString()}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+      showsVerticalScrollIndicator={false}
+    />
   );
 }

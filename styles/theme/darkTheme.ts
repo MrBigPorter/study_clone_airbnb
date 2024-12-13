@@ -18,6 +18,7 @@ export const darkTheme = {
     paper: '#2B2B2B', // Paper-like background for cards and surfaces
     secondary: '#333333', // Secondary background for contrast
     tertiary: '#404040', // Tertiary background for additional contrast
+    contrast: '#FFFFFF', // High contrast color for primary backgrounds
   },
   border: {
     default: '#404040', // Default border color

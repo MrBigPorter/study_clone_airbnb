@@ -1,3 +1,7 @@
+import { NativeSyntheticEvent } from "react-native";
+
+import { NativeScrollEvent } from "react-native";
+
 interface ExploreItemType {
     id: number;
     title: string;
@@ -8,5 +12,8 @@ interface ExploreItemType {
     images: any[];
 }
 
+interface ExploreListProps {
+    onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+}
 
-export type { ExploreItemType };
+export type { ExploreItemType, ExploreListProps };
