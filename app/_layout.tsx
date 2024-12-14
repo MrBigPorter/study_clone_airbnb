@@ -3,8 +3,17 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import 'react-native-reanimated';
+
+// This is the default configuration
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Reanimated runs in strict mode by default
+});
 
 // 防止启动屏幕自动隐藏
 SplashScreen.preventAutoHideAsync();
@@ -36,7 +45,8 @@ export default function RootLayout() {
 
   // 返回Stack导航组件 Return Stack navigation component
   return (
-    <ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
         <Stack
           // 设置所有页面的默认配置 Set default options for all screens
           screenOptions={{
@@ -56,6 +66,7 @@ export default function RootLayout() {
             }}
           />
         </Stack>
-    </ThemeProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

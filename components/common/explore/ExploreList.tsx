@@ -61,7 +61,7 @@ export default function ExploreList({onScroll}:ExploreListProps) {
 
   // 处理滚动事件 Handle scroll events
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    onScroll && onScroll(event);
+    onScroll && onScroll(event.nativeEvent.contentOffset.y);
   };
 
   return (

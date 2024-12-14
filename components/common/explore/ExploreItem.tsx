@@ -263,7 +263,6 @@ const styles = StyleSheet.create({
     position: 'relative', 
     height: 310,
     borderRadius: 16,
-    backgroundColor: 'red',
     overflow: 'hidden',
   },
   // 轮播项容器样式 Slide container styles
