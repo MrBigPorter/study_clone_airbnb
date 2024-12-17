@@ -27,7 +27,7 @@ const MapButton = ({ scrollY, onOpen }: MapButtonProps) => {
   const translateY = useSharedValue(100);
 
   useEffect(() => {
-    const shouldShow = scrollY > 100;
+    const shouldShow = scrollY > 50;
     opacity.value = withTiming(shouldShow ? 1 : 0, { duration: 300 });
     translateY.value = withSpring(shouldShow ? 0 : 100, {
       damping: 15,
