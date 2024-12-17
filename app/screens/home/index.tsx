@@ -1,18 +1,16 @@
-import {
-  View,
-  SafeAreaView,
-} from 'react-native';
+import { View, SafeAreaView } from 'react-native';
 import SearchHeader from '@/components/common/searchHeader';
 import CategoryList from '@/components/common/CategoryList';
 import ExploreList from '@/components/common/explore/ExploreList';
-import { Stack,  useNavigation } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useCustomTheme } from '@/context/themeContext';
 import { Platform, StyleSheet } from 'react-native';
 import MapButton from '@/components/common/MapButton';
-import {useState, useCallback, useRef} from 'react';
+import { useState, useCallback, useRef, } from 'react';
 import BottomSheetModal from '@/components/common/modal/BottomSheet';
 import Map from '@/components/common/Map';
-import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetFlatListMethods } from '@gorhom/bottom-sheet';
+import { useSharedValue } from 'react-native-reanimated';
 /**
  * Home Screen Component
  * 首页屏幕组件
@@ -21,7 +19,6 @@ import BottomSheet from '@gorhom/bottom-sheet';
  * 显示包含搜索头部、分类列表、探索列表和地图按钮的主页面
  */
 export default function Home() {
-  const navigation = useNavigation();
   // Get theme background from context
   // 从上下文获取主题背景色
   const {
@@ -29,10 +26,15 @@ export default function Home() {
   } = useCustomTheme();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const animatedPositionValue = useSharedValue(0);
 
   // Track scroll position for map button animation
   // 跟踪滚动位置以实现地图按钮动画
   const [scrollY, setScrollY] = useState(0);
+
+  // Create a ref to access BottomSheetFlatList methods like scrollTo
+  // 创建一个ref来访问BottomSheetFlatList的方法,比如scrollTo
+  const exploreListRef = useRef<BottomSheetFlatListMethods>(null);
 
   // Handle scroll events from explore list
   // 处理探索列表的滚动事件
@@ -45,8 +47,11 @@ export default function Home() {
   const onOpen = useCallback(() => {
     // Close the bottom sheet modal / 关闭底部表单模态框
     bottomSheetRef.current?.snapToIndex(0);
+    // Scroll to the top of the explore list / 滚动到探索列表的顶部
+    exploreListRef.current?.scrollToOffset({ offset: 0 });
+    // Set the scroll position to 0 / 设置滚动位置为0
+    setScrollY(0);
   }, []);
-
 
   return (
     <View style={[styles.container, { backgroundColor: background.default }]}>
@@ -62,7 +67,7 @@ export default function Home() {
           ),
         }}
       />
-     
+
       {/* Map component */}
       {/* 
         The Map component is positioned between the bottom sheet modal and floating map button.
@@ -85,10 +90,12 @@ export default function Home() {
 
       {/* Bottom sheet modal containing the explore list */}
       {/* 包含探索列表的底部表单模态框 */}
-      <BottomSheetModal ref={bottomSheetRef}>
-        <ExploreList onScroll={handleScroll} />
-      </BottomSheetModal> 
-
+      <BottomSheetModal
+        ref={bottomSheetRef}
+        animatedPositionValue={animatedPositionValue}
+      >
+        <ExploreList ref={exploreListRef} onScroll={handleScroll} />
+      </BottomSheetModal>
     </View>
   );
 }

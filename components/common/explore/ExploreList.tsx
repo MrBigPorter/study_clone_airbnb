@@ -6,14 +6,17 @@
  * 在底部表单中显示探索项目列表,包含总数和价格显示切换的头部
  */
 import ExploreItem from './ExploreItem';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, forwardRef } from 'react';
 import { ExploreItemType, ExploreListProps } from '@/types/exploreTypes';
-import { NativeScrollEvent, NativeSyntheticEvent, View, Text, StyleSheet } from 'react-native';
+import {  View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useCustomTheme } from '@/context/themeContext';
 import { Switch } from 'react-native-paper';
-import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { BottomSheetFlatList, BottomSheetFlatListMethods} from '@gorhom/bottom-sheet';
+import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
-export default function ExploreList({ onScroll }: ExploreListProps) {
+const ExploreList = forwardRef((
+  { onScroll }: ExploreListProps,
+  ref:React.ForwardedRef<BottomSheetFlatListMethods>) => {
   // Mock data for explore list
   // 探索列表的模拟数据
   const [list] = useState<ExploreItemType[]>([
@@ -53,17 +56,19 @@ export default function ExploreList({ onScroll }: ExploreListProps) {
       image: require('@/assets/images/home/list/1.png'),
       images: Array(3).fill(require('@/assets/images/home/list/1.png')),
     },
-  ]);
+  ]); 
 
   const { theme: { border, background, text } } = useCustomTheme();
   const [switchValue, setSwitchValue] = useState(false);
 
-  // Handle scroll event and pass scroll position to parent
-  // 处理滚动事件并将滚动位置传递给父组件
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    onScroll?.(offsetY);
-  }, [onScroll]);
+
+  // Update the scroll handler with correct types
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      onScroll?.(event.nativeEvent.contentOffset.y);
+    },
+    [onScroll]
+  ) as ScrollView['props']['onScroll'];
 
   // Toggle price display switch
   // 切换价格显示开关
@@ -113,16 +118,19 @@ export default function ExploreList({ onScroll }: ExploreListProps) {
   return (
     <View style={styles.container}>
       <BottomSheetFlatList
+        ref={ref}
         data={list}
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={ListHeaderComponent}
-        onScroll={handleScroll}
+        onScrollEndDrag={handleScroll}
       />
     </View>
   );
-}
+})
+
+export default ExploreList;
 
 // Styles for the explore list component
 // 探索列表组件的样式
