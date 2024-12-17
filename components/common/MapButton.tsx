@@ -1,4 +1,4 @@
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCustomTheme } from '@/context/themeContext';
 import { useEffect } from 'react';
@@ -12,13 +12,13 @@ import { MapButtonProps } from '@/types/buttonTypes';
 /**
  * Map Button Component
  * 地图按钮组件
- * 
+ *
  * A floating action button that appears when scrolling down and disappears when scrolling up.
  * Used to toggle between list view and map view.
  * 一个在向下滚动时出现、向上滚动时消失的悬浮按钮。
  * 用于在列表视图和地图视图之间切换。
  */
-const MapButton = ({ scrollY }: MapButtonProps) => {
+const MapButton = ({ scrollY, onOpen }: MapButtonProps) => {
   const {
     theme: { background, text },
   } = useCustomTheme();
@@ -37,23 +37,28 @@ const MapButton = ({ scrollY }: MapButtonProps) => {
 
   const animatedStyles = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [
-      { translateX: -44 },
-      { translateY: translateY.value }
-    ],
+    transform: [{ translateX: -44 }, { translateY: translateY.value }],
     pointerEvents: opacity.value === 0 ? 'none' : 'auto',
   }));
 
+  const handlePress = () => {
+    if (onOpen) { 
+      onOpen();
+    }
+  };
+
   return (
-    <Animated.View 
+    <Animated.View
       style={[
-        styles.mapButton, 
-        { backgroundColor: background.contrast }, 
+        styles.mapButton,
+        { backgroundColor: background.contrast },
         animatedStyles,
-      ]}
-    > 
-      <Text style={{ color: text.inverse, marginRight: 5 }}>Map</Text> 
-      <Ionicons name="map" size={24} color={text.inverse} />  
+      ]}  
+    >
+      <TouchableOpacity onPress={handlePress} style={{flexDirection:'row',alignItems:'center'}}>
+        <Text style={{ color: text.inverse, marginRight: 5 }}>Map</Text>
+        <Ionicons name="map" size={24} color={text.inverse} />
+      </TouchableOpacity>
     </Animated.View>
   );
 };
