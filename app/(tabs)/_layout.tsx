@@ -52,7 +52,7 @@ const TabLayout = () => {
         <Tabs.Screen 
           name="wishlists"
           options={{
-            headerShown:false,
+            headerShown:true,
             tabBarLabel: "Wishlists",
             tabBarIcon:({color,size})=>(
               <Ionicons name="heart-outline" color={color} size={Platform.OS === 'ios' ? size : size - 2} />

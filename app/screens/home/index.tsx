@@ -1,4 +1,4 @@
-import { View, SafeAreaView } from 'react-native';
+import { View, SafeAreaView, Text, Dimensions, Button, Pressable } from 'react-native';
 import SearchHeader from '@/components/common/searchHeader';
 import CategoryList from '@/components/common/CategoryList';
 import ExploreList from '@/components/common/explore/ExploreList';
@@ -6,11 +6,14 @@ import { Stack } from 'expo-router';
 import { useCustomTheme } from '@/context/themeContext';
 import { Platform, StyleSheet } from 'react-native';
 import MapButton from '@/components/common/MapButton';
-import { useState, useCallback, useRef, } from 'react';
-import BottomSheetModal from '@/components/common/modal/BottomSheet';
+import { useState, useCallback, useRef, useMemo, } from 'react';
+import BottomSheetCustomModal from '@/components/common/modal/BottomSheet';
 import Map from '@/components/common/Map';
-import BottomSheet, { BottomSheetFlatListMethods } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetFlatListMethods} from '@gorhom/bottom-sheet';
 import { useSharedValue } from 'react-native-reanimated';
+import { ActionSheetRef } from 'react-native-actions-sheet';
+import BottomCustomActionSheet from '@/components/common/modal/BottomCustomActionSheet';
+import ExploreFilters from '@/components/common/explore/ExploreFilters';
 /**
  * Home Screen Component
  * 首页屏幕组件
@@ -25,8 +28,11 @@ export default function Home() {
     theme: { background },
   } = useCustomTheme();
 
+
   const bottomSheetRef = useRef<BottomSheet>(null);
   const animatedPositionValue = useSharedValue(0);
+
+  const bottomFilterActionSheetRef = useRef<ActionSheetRef>(null)
 
   // Track scroll position for map button animation
   // 跟踪滚动位置以实现地图按钮动画
@@ -52,6 +58,15 @@ export default function Home() {
     // Set the scroll position to 0 / 设置滚动位置为0
     setScrollY(0);
   }, []);
+  
+  const handleFilterPress = (isPressed: boolean)=>{
+    if(isPressed){
+      // 打开过滤弹窗
+     //setIsFilterModalVisible(true)
+     bottomFilterActionSheetRef.current?.show()
+    }
+  }
+
 
   return (
     <View style={[styles.container, { backgroundColor: background.default }]}>
@@ -61,7 +76,7 @@ export default function Home() {
         options={{
           header: () => (
             <SafeAreaView style={styles.safeArea}>
-              <SearchHeader />
+              <SearchHeader onFilterPress={handleFilterPress}/>
               <CategoryList />
             </SafeAreaView>
           ),
@@ -82,20 +97,28 @@ export default function Home() {
         2. 地图需要在底部表单上方，这样当表单收起时地图仍然可见
         3. 这种层序为所有交互元素创建了正确的z-index堆叠
       */}
+
+      
       <Map />
 
+     
       {/* Floating map button with scroll-based animation */}
       {/* 带有基于滚动的动画效果的浮动地图按钮 */}
       <MapButton onOpen={onOpen} scrollY={scrollY} />
 
       {/* Bottom sheet modal containing the explore list */}
       {/* 包含探索列表的底部表单模态框 */}
-      <BottomSheetModal
+      <BottomSheetCustomModal
         ref={bottomSheetRef}
         animatedPositionValue={animatedPositionValue}
       >
         <ExploreList ref={exploreListRef} onScroll={handleScroll} />
-      </BottomSheetModal>
+      </BottomSheetCustomModal>
+     
+      <BottomCustomActionSheet containerStyle={{height:'95%'}} gestureEnabled={false} ref={bottomFilterActionSheetRef}>
+        <ExploreFilters/>
+      </BottomCustomActionSheet>
+
     </View>
   );
 }
@@ -111,4 +134,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: Platform.OS === 'android' ? 12 : 0,
   },
+  bottomSheet:{
+    backgroundColor:'blue',
+    height:'100%',
+    zIndex:1000,
+    ...StyleSheet.absoluteFillObject
+  },
+  overlay: {
+    position:'absolute',
+    top:0,
+    left:0,   
+    zIndex:1000,
+    width:'100%',
+    height:'100%',
+    backgroundColor: 'rgba(0, 0, 0, 1)', // 可选：设置一个覆盖背景
+  },
+  content:{
+    flex:1,
+    backgroundColor:'#fff',
+    height:'100%',
+    
+  }
 });
