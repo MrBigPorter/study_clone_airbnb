@@ -29,4 +29,14 @@ interface ExploreFiltersButtonProps {
     onFilterPress?: (isPressed: boolean) => void;  // Filter press event handler / 过滤器点击事件处理函数
 }
 
-export type { ExploreItemType, ExploreListProps, ExploreFiltersButtonProps };
+/**
+ * Explore Filters Place Types Props Interface
+ * 探索过滤器地点类型属性接口
+ */
+interface ExploreFiltersPlaceTypesProps{
+    id:number,
+    name:string,
+    index:number,
+}
+
+export type { ExploreItemType, ExploreListProps, ExploreFiltersButtonProps,ExploreFiltersPlaceTypesProps };
