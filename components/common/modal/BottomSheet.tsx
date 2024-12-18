@@ -37,7 +37,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
  * The component is wrapped in a forwardRef to allow parent components to access the bottom sheet methods.
  * It's used in the home screen to show a map view with an expandable list of locations.
  */
-export default forwardRef(function BottomSheetModal({
+export default forwardRef(function BottomSheetCustomModal({
   children, // Child components to render inside the bottom sheet / 在底部表单内渲染的子组件
   style, // Additional styles for the bottom sheet / 底部表单的额外样式
   snapPoints = ['10%', '100%'], // Points where the sheet can snap to / 表单可以停靠的位置点，默认为10%和100%
@@ -45,7 +45,8 @@ export default forwardRef(function BottomSheetModal({
   backgroundStyle, // Custom background style / 自定义背景样式
   handleIndicatorStyle, // Custom handle indicator style / 自定义手柄指示器样式
   index = 1, // Default index for the bottom sheet / 底部表单的默认索引
-  animatedPositionValue, // Animated position for the bottom sheet / 底部表单的动画位置
+  animatedPositionValue,// Animated position for the bottom sheet / 底部表单的动画位置
+  backdropOpacity = 0, // Transparent backdrop / 透明背景
 }: BottomSheetProps,ref:ForwardedRef<BottomSheet>) {
 
   // Convert snap points to string array / 将停靠点转换为字符串数组
@@ -70,7 +71,7 @@ export default forwardRef(function BottomSheetModal({
         {...props}
         disappearsOnIndex={-1} // Backdrop disappears when sheet is closed / 当表单关闭时背景消失
         appearsOnIndex={0} // Backdrop appears when sheet is opened / 当表单打开时背景出现
-        opacity={0} // Transparent backdrop / 透明背景
+        opacity={backdropOpacity} // Transparent backdrop / 透明背景
       />
     ),
     []
@@ -129,7 +130,9 @@ const styles = StyleSheet.create({
     pointerEvents: 'box-none', // Allow touches to pass through to underlying components / 允许触摸穿透到底层组件
     marginTop: -55, // Negative margin to adjust position / 负边距用于调整位置
   },
-  
+  backdrop: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
   background: {
     backgroundColor: 'white',
     borderTopLeftRadius: 24,

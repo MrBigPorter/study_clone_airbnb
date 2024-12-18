@@ -6,13 +6,15 @@ import { View, Text, StyleSheet, Platform, Pressable } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
 import { Surface } from 'react-native-paper';
+import { ExploreFiltersButtonProps } from '@/types/exploreTypes';
 // 搜索头部组件
 // Search header component
-export default function SearchHeader() {
+export default function SearchHeader({ onFilterPress }:ExploreFiltersButtonProps) {
   const [isPressed, setIsPressed] = useState<boolean>(false);
 
   const filterPress = (isPressed: boolean) => {
     setIsPressed(isPressed);
+    onFilterPress?.(isPressed);
   };
   return (
     <View style={styles.searchBar}>
