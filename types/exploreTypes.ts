@@ -1,3 +1,5 @@
+import { StyleProp } from "react-native";
+import { ViewStyle } from "react-native";
 
 /**
  * Explore Item Type Definition
@@ -39,4 +41,8 @@ interface ExploreFiltersPlaceTypesProps{
     index:number,
 }
 
-export type { ExploreItemType, ExploreListProps, ExploreFiltersButtonProps,ExploreFiltersPlaceTypesProps };
+interface ExploreFiltersTitleProps{
+    name:string,
+    style?:any,
+}
+export type { ExploreItemType, ExploreListProps, ExploreFiltersButtonProps,ExploreFiltersPlaceTypesProps,ExploreFiltersTitleProps };
