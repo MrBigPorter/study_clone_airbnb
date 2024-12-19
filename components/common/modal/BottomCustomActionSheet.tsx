@@ -106,9 +106,11 @@ const BottomCustomActionSheet = forwardRef<
         }}> 
           <Ionicons name="close" size={24} color={text.primary} />
         </TouchableOpacity>
-        <Text style={[styles.actionSheetHeaderText, { color: text.primary }]}>
-          Filter
-        </Text>
+        {props.title && ( 
+          <Text style={[styles.actionSheetHeaderText, { color: text.primary }]}>
+            {props.title}
+          </Text>
+        )}
       </View>
     );
   };

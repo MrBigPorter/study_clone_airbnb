@@ -1,7 +1,7 @@
 import { useCustomTheme } from '@/context/themeContext';
-import { ExploreFiltersPlaceTypesProps } from '@/types/exploreTypes';
+import { ExploreFiltersPlaceTypesProps, ExploreFiltersTitleProps } from '@/types/exploreTypes';
 import { useCallback, useMemo, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Pressable, Animated } from 'react-native';
+import { View, Text, Pressable, Animated } from 'react-native';
 import { StyleSheet } from 'react-native';
 
 export default function ExploreFilters() {
@@ -124,13 +124,23 @@ export default function ExploreFilters() {
     );
   }, []);
 
+  // Item title component / 项目标题组件
+  const itemTitle = ({
+    name,
+    style=null
+  }:ExploreFiltersTitleProps)=>{
+      return (
+        <Text style={[styles.itemTitleText, { color: text.primary }, style]}>
+          {name}
+        </Text>
+      )
+  }
+
   return (
     <View style={styles.container}>
       {/* Filter top section / 过滤器顶部部分 */}
-      <View style={styles.filterTop}>
-        <Text style={[styles.filterTopText, { color: text.primary }]}>
-          Type of place
-        </Text>
+      <View style={[styles.filterTop, {  borderBottomColor: border.default }]}>
+        {itemTitle({name:'Type of place'})}
         <View style={[styles.placeType, { borderColor: border.default }]}>
           {placeTypes.map((placeType, index) => (
             <PlaceTypeItem
@@ -157,7 +167,10 @@ export default function ExploreFilters() {
       </View>
       {/* Filter middle section / 过滤器中间部分 */}
       <View style={styles.filterMiddle}>
-        <Text>Explore Filters</Text>
+        {itemTitle({name:'Price range',style:{marginBottom:4}})}
+        <Text style={[styles.priceRangeText, { color: text.secondary }]}>
+          Nightly prices before fees and taxes
+        </Text>
       </View>
       {/* Filter bottom section / 过滤器底部部分 */}
       <View style={styles.filterBottom}>
@@ -174,8 +187,10 @@ const styles = StyleSheet.create({
   },
   filterTop: {
     paddingBottom: 32, // Top section bottom padding / 顶部部分底部内边距
+    borderBottomWidth: 1,
+    marginBottom: 32,
   },
-  filterTopText: {
+  itemTitleText: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 32, // Text bottom margin / 文本底部外边距
@@ -210,8 +225,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     position: 'absolute',
     right: 0,
-    top: 0,
-    bottom: 0,
+    top: 4.4,
+    height: '98%',
   },
   placeTypeItemText: {
     fontSize: 14,
@@ -220,8 +235,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   filterMiddle: {
-    height: 50,
-    backgroundColor: 'blue', // Middle section background / 中间部分背景色
+    
+  },
+  priceRangeText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
+    marginBottom:24
   },
   filterBottom: {
     height: 50,

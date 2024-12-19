@@ -61,6 +61,8 @@ interface BottomCustomActionSheetProps {
     elevation?:number;
     /** Close sheet when backdrop is touched 点击背景时是否关闭面板 */
     closeOnTouchBackdrop?:boolean;
+    /** Title of the action sheet 动作面板的标题 */
+    title?:string;
 }
 
 /**
