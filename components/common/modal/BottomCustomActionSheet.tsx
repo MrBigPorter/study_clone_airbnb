@@ -1,4 +1,3 @@
-
 /* 
   A custom bottom action sheet component that provides a modal-like interface sliding up from the bottom of the screen.
   It supports customizable styling, animations, and gesture controls.
@@ -22,17 +21,16 @@
   - snapPoints: String[] - Points where sheet can snap to 面板可以吸附的位置点
   - elevation: number - Shadow elevation on Android Android上的阴影高度
   - closeOnTouchBackdrop: boolean - Close sheet when backdrop is touched 点击背景时是否关闭面板
+  - keyboardHandlerEnabled: boolean - Enable/disable keyboard controls 启用/禁用键盘控制
 */
 import { useCustomTheme } from '@/context/themeContext';
 import { Ionicons } from '@expo/vector-icons';
-import React, { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { StyleSheet } from 'react-native';
+import React, { forwardRef, useImperativeHandle, useMemo, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Keyboard, KeyboardAvoidingView, Platform, Animated } from 'react-native';
+import { StyleSheet,KeyboardEvent } from 'react-native';
 import ActionSheet, { ActionSheetRef } from 'react-native-actions-sheet';
 import { BottomCustomActionSheetProps,BottomCustomActionSheetHandle } from '@/types/modalTypes';
-
 /* 
-/*
   Component description:
   A custom bottom action sheet component that extends react-native-actions-sheet.
   Provides a modal interface that slides up from bottom with customizable styling and behavior.
@@ -73,6 +71,7 @@ const BottomCustomActionSheet = forwardRef<
   // Create a reference to the action sheet
   // 创建一个底部动作面板的引用
   const actionSheetRef = useRef<ActionSheetRef>(null)
+  const translateY = useRef(new Animated.Value(0)).current
 
   // Expose show/hide methods to parent component for external control
   // 向父组件暴露显示/隐藏方法以供外部控制
@@ -82,6 +81,7 @@ const BottomCustomActionSheet = forwardRef<
     hide:()=>{
       actionSheetRef.current?.hide()
       props.onClose?.()
+      Keyboard.dismiss()
     },
     // Show the action sheet and call onOpen callback
     // 显示底部动作面板并调用 onOpen 回调
@@ -89,7 +89,7 @@ const BottomCustomActionSheet = forwardRef<
      actionSheetRef.current?.show()
      props.onOpen?.()
     },
-  }),[actionSheetRef])
+  }),[])
 
   // Render the header component with close button and title
   // 渲染带有关闭按钮和标题的头部组件 
@@ -103,6 +103,7 @@ const BottomCustomActionSheet = forwardRef<
       >
         <TouchableOpacity onPress={()=>{
           actionSheetRef.current?.hide()
+          props.onClose?.()
         }}> 
           <Ionicons name="close" size={24} color={text.primary} />
         </TouchableOpacity>
@@ -135,10 +136,37 @@ const BottomCustomActionSheet = forwardRef<
   // 使用 useMemo 优化性能  
   const snapPoints = useMemo(()=>{
     if(props.snapPoints){
-      return props.snapPoints.map((snapPoint)=>Number(snapPoint))
+      return props.snapPoints.map((snapPoint)=>{
+        const num = Number(snapPoint)
+        if(isNaN(num)) return 100
+        return num
+      })
     }
     return [100]
   },[props.snapPoints])
+
+  useEffect(()=>{
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow',(e:KeyboardEvent)=>{
+      const keyboardHeight = e.endCoordinates.height
+      Animated.timing(translateY, {
+        toValue: -keyboardHeight,
+        duration: 300,
+        useNativeDriver: true,
+      }).start()
+    })
+
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide',(e:KeyboardEvent)=>{
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start()
+    })
+    return ()=>{
+      keyboardDidShowListener.remove()
+      keyboardDidHideListener.remove()
+    }
+  },[])
 
   return (
     <View>
@@ -148,6 +176,7 @@ const BottomCustomActionSheet = forwardRef<
           ...indicatorStyle as object,
           ...props.indicatorStyle as object,
         }}
+        keyboardHandlerEnabled={true}
         gestureEnabled={props.gestureEnabled??true}
         drawUnderStatusBar={false}
         useBottomSafeAreaPadding={true}
@@ -158,6 +187,10 @@ const BottomCustomActionSheet = forwardRef<
         overlayColor={props.overlayColor??'rgba(0,0,0,0.9)'}
         defaultOverlayOpacity={props.defaultOverlayOpacity??0.5}
         closeOnTouchBackdrop={props.closeOnTouchBackdrop??true}
+        onClose={() => {
+          props.onClose?.()
+          Keyboard.dismiss()
+        }}
         onBeforeShow={() => {
           props.onBeforeShow?.()
         }}
@@ -165,10 +198,10 @@ const BottomCustomActionSheet = forwardRef<
           props.onBeforeClose?.()
         }}
       >
-        <View>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           {props.header??actionHeader()}
           {props.children}
-        </View>
+        </KeyboardAvoidingView>
       </ActionSheet>
     </View>
   );

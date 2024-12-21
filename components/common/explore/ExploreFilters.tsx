@@ -3,7 +3,7 @@ import { ExploreFiltersPlaceTypesProps, ExploreFiltersTitleProps } from '@/types
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { View, Text, Pressable, Animated } from 'react-native';
 import { StyleSheet } from 'react-native';
-
+import { PriceRangeSlider } from './PriceRangeSlider';
 export default function ExploreFilters() {
   const {
     theme: { text, border },
@@ -166,11 +166,12 @@ export default function ExploreFilters() {
         </View>
       </View>
       {/* Filter middle section / 过滤器中间部分 */}
-      <View style={styles.filterMiddle}>
+      <View style={[styles.filterMiddle, { borderBottomColor: border.default }]}>
         {itemTitle({name:'Price range',style:{marginBottom:4}})}
         <Text style={[styles.priceRangeText, { color: text.secondary }]}>
           Nightly prices before fees and taxes
         </Text>
+        <PriceRangeSlider/>
       </View>
       {/* Filter bottom section / 过滤器底部部分 */}
       <View style={styles.filterBottom}>
@@ -235,7 +236,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   filterMiddle: {
-    
+    paddingBottom: 32,
+    marginBottom: 32,
+    borderBottomWidth: 1,
   },
   priceRangeText: {
     fontSize: 14,
