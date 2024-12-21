@@ -1,18 +1,45 @@
 import { useEffect, useRef } from 'react';
-import { View, Text, Button } from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import BottomCustomActionSheet from '@/components/common/modal/BottomCustomActionSheet';
 import { ActionSheetRef } from 'react-native-actions-sheet';
 
 const Wishlists = () => {
-    const bottomFilterActionSheetRef = useRef<ActionSheetRef>(null)
+  const bottomFilterActionSheetRef = useRef<ActionSheetRef>(null);
   return (
     <View>
-        <Button title='Show Action Sheet' onPress={()=>{
-            bottomFilterActionSheetRef.current?.show()
-        }}/>
-        <BottomCustomActionSheet ref={bottomFilterActionSheetRef}>
-            <Text>Hi, I am here.</Text>
-        </BottomCustomActionSheet>
+      <Button
+        title="Show Action Sheet"
+        onPress={() => {
+          bottomFilterActionSheetRef.current?.show();
+        }}
+      />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <TextInput
+          style={{
+            height: 40,
+            borderColor: 'gray',
+            borderWidth: 1,
+            paddingHorizontal: 8,
+          }}
+          keyboardType='number-pad'
+          placeholder="Enter text"
+          onChangeText={(text) => console.log(text)}
+        />
+      </KeyboardAvoidingView>
+      <BottomCustomActionSheet ref={bottomFilterActionSheetRef}>
+        <Text>Hi, I am here.</Text>
+      </BottomCustomActionSheet>
       {/* <ActionSheet
         containerStyle={{
             backgroundColor:'red',

@@ -63,6 +63,8 @@ interface BottomCustomActionSheetProps {
     closeOnTouchBackdrop?:boolean;
     /** Title of the action sheet 动作面板的标题 */
     title?:string;
+    /** Enable/disable keyboard handler 启用/禁用键盘处理 */
+    keyboardHandlerEnabled?: boolean;
 }
 
 /**
