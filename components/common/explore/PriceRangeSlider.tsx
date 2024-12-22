@@ -6,6 +6,7 @@ import { View, Animated, PanResponder, Text, Platform } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 
+
 export const PriceRangeSlider = () => {
   // 使用主题上下文获取背景和边框颜色
   // Use theme context to get background and border colors
@@ -13,7 +14,7 @@ export const PriceRangeSlider = () => {
     theme: { background, border,text },
   } = useCustomTheme();
 
-  // 直方图数据 - 展示价格分布情20
+  // 直方图数据 - 展示价格分布情况
   // Histogram data - Shows price distribution
   const histogram = [
     4, 6, 8, 12, 16, 20, 18, 14, 10, 8, 6, 4, 3, 2, 2, 1, 1, 1, 1, 1,
@@ -24,10 +25,6 @@ export const PriceRangeSlider = () => {
   const [thumbWidth, setThumbWidth] = useState<number>(0);
   const [sliderWidth, setSliderWidth] = useState<number>(0);
 
-  // 左右滑块是否聚焦
-  // Whether the left and right thumbs are focused
-  const [isLeftPriceFocused, setIsLeftPriceFocused] = useState<boolean>(false);
-  const [isRightPriceFocused, setIsRightPriceFocused] = useState<boolean>(false); 
 
   // 左右滑块的位置动画值
   // Animated values for left and right thumb positions
@@ -42,7 +39,8 @@ export const PriceRangeSlider = () => {
   // Minimum and maximum values for price range
   const MIN_PRICE = 0;
   const MAX_PRICE = 1000;
-   // 最小价格间隔，防止左右滑块重叠
+  // 最小价格间隔，防止左右滑块重叠
+  // Minimum price gap to prevent thumb overlap
   const MIN_PRICE_GAP = 10;
   const [leftPrice, setLeftPrice] = useState(MIN_PRICE);
   const [rightPrice, setRightPrice] = useState(MAX_PRICE);
@@ -128,8 +126,7 @@ export const PriceRangeSlider = () => {
   
   // 处理价格输入
   // Handle price input
-
-  const handlePriceInput = useCallback((value:string,isLeft:boolean) => {
+  const handlePriceInput = useCallback(({value,isLeft}:{value:string,isLeft:boolean}) => {
     const price = parseInt(value)||0;
     if(isLeft){
       if(price<rightPrice -  MIN_PRICE_GAP){
@@ -145,7 +142,22 @@ export const PriceRangeSlider = () => {
 
     },[leftPrice,rightPrice])
 
-   const updateThumbPositions = useCallback((leftPrice:number,rightPrice:number) => {
+    // 处理左滑块价格输入
+    // Handle left thumb price input  
+    const handleLeftPriceInput = useCallback((value:string)=>{
+      handlePriceInput({value,isLeft:true});
+    },[handlePriceInput]) 
+
+    const handleRightPriceInput = useCallback((value:string)=>{
+      handlePriceInput({value,isLeft:false});
+    },[handlePriceInput])
+    
+
+
+
+  // 更新滑块位置
+  // Update thumb positions
+  const updateThumbPositions = useCallback((leftPrice:number,rightPrice:number) => {
     const sliderRange = sliderWidth - thumbWidth;
     const leftPosition = (leftPrice / MAX_PRICE) * sliderRange;
     const rightPosition = ((MAX_PRICE - rightPrice) / MAX_PRICE) * sliderRange;
@@ -153,15 +165,7 @@ export const PriceRangeSlider = () => {
     rightThumbX.setValue(rightPosition);
    },[sliderWidth,thumbWidth,MAX_PRICE])
 
-  // 价格输入框样式
-  // Price input box styles - Controls price input box appearance
-  const containerStyle = useMemo(()=>{
-    return {
-      ...styles.priceMinMaxInputContainer,
-      ...Platform.OS === 'android' && {borderWidth:2}
-    }
-  },[border.default])
-
+ 
   return (
     <View>
       {/* 直方图容器 - 显示价格分布 
@@ -221,43 +225,73 @@ export const PriceRangeSlider = () => {
       </View>
       {/* 价格范围选择器 Price range selector */}
       <View style={styles.priceMinMaxContainer}>
-        <View style={styles.priceMinMaxItem}>
-          <Text style={[styles.priceMinMaxText, {color: text.secondary}]}>Minimum</Text>
-          <View style={[containerStyle, {borderColor: border.default},isLeftPriceFocused && {borderColor: border.focus}]}>
-           <Text style={[styles.dollarSign, {color: text.tertiary}]}>$</Text>
-            <TextInput
-              style={[styles.priceMinMaxTextInput, {color: text.tertiary}]}
-              value={leftPrice.toString()}
-              onChangeText={(text) => handlePriceInput(text,true)}
-              onFocus={() => setIsLeftPriceFocused(true)}
-              onBlur={() => setIsLeftPriceFocused(false)}
-              keyboardType='number-pad'
-              returnKeyType='done'
-              enablesReturnKeyAutomatically={true}
-            />
-          </View> 
-        </View>
-        <View style={styles.priceMinMaxItem}>
-          <Text style={[styles.priceMinMaxText, {color: text.secondary}]}>Minimum</Text>
-          <View style={[containerStyle, {borderColor: border.default},isRightPriceFocused && {borderColor: border.focus}]}>
-            <Text style={[styles.dollarSign, {color: text.tertiary}]}>$</Text>
-            <TextInput
-              style={[styles.priceMinMaxTextInput, {color: text.tertiary}]}
-              value={rightPrice.toString()}
-              onChangeText={(text) => handlePriceInput(text,false)}
-              onFocus={() => setIsRightPriceFocused(true)}
-              onBlur={() => setIsRightPriceFocused(false)}
-              keyboardType={Platform.select({
-                ios: 'number-pad',    // iOS 使用 number-pad
-                android: 'numeric'    // Android 保持 numeric
-              })}
-            />
-          </View>
-        </View>
+          <PriceInputItem onChange={handleLeftPriceInput} value={leftPrice.toString()} title='Minimum' />
+          <PriceInputItem onChange={handleRightPriceInput} value={rightPrice.toString()} title='Maximum' />
       </View> 
     </View>
   );
 };
+
+// 价格输入框组件 - 用于输入价格
+// Price input box component - Used for inputting price
+// PriceInputItem组件 - 用于输入最小和最大价格
+// PriceInputItem component - Used for inputting minimum and maximum prices
+// 参数说明:
+// Parameters:
+// value: string - 当前输入框的值 Current input value
+// onChange: (text:string)=>void - 值改变时的回调函数 Callback when value changes
+// title: string - 输入框标题(Minimum/Maximum) Input title (Minimum/Maximum)
+
+const PriceInputItem = ({
+  value,
+  onChange,
+  title
+}: {
+  value: string;
+  onChange: (text: string) => void;
+  title: string;
+}) => {
+  const {
+    theme: { border, text },
+  } = useCustomTheme();
+
+  const [isFocused, setIsFocused] = useState<boolean>(false);
+
+  const containerStyle = useMemo(() => ({
+    ...styles.priceMinMaxInputContainer,
+    ...(Platform.OS === 'android' && { borderWidth: 2 })
+  }), []);
+
+  return (
+    <View style={styles.priceMinMaxItem}>
+      <Text style={[styles.priceMinMaxText, { color: text.secondary }]}>
+        {title}
+      </Text>
+      <View 
+        style={[
+          containerStyle,
+          { borderColor: isFocused ? border.focus : border.default }
+        ]}
+      >
+        <Text style={[styles.dollarSign, { color: text.tertiary }]}>$</Text>
+        <TextInput
+          style={[styles.priceMinMaxTextInput, { color: text.tertiary }]}
+          value={value}
+          onChangeText={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          keyboardType={Platform.select({
+            ios: 'number-pad',
+            android: 'numeric'
+          })}
+          returnKeyType="done"
+          enablesReturnKeyAutomatically
+        />
+      </View>
+    </View>
+  );
+};
+
 
 // 样式定义 Style definitions
 const styles = StyleSheet.create({

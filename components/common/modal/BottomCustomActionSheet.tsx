@@ -26,7 +26,7 @@
 import { useCustomTheme } from '@/context/themeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React, { forwardRef, useImperativeHandle, useMemo, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Keyboard, KeyboardAvoidingView, Platform, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Keyboard, KeyboardAvoidingView, Platform, Animated, ScrollView } from 'react-native';
 import { StyleSheet,KeyboardEvent } from 'react-native';
 import ActionSheet, { ActionSheetRef } from 'react-native-actions-sheet';
 import { BottomCustomActionSheetProps,BottomCustomActionSheetHandle } from '@/types/modalTypes';
@@ -199,8 +199,10 @@ const BottomCustomActionSheet = forwardRef<
         }}
       >
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          {props.header??actionHeader()}
+        {props.header??actionHeader()}
+         <ScrollView>
           {props.children}
+         </ScrollView>
         </KeyboardAvoidingView>
       </ActionSheet>
     </View>
