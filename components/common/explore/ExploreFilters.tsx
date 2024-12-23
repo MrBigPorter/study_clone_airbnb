@@ -7,8 +7,13 @@ import {
   ExploreFiltersTitleProps,
   AmenitiesItemIconProps,
   AmenitiesItemProps,
+  BookingOptionsProps,
+  PropertyTypesProps,
+  ExploreFiltersAccessibilityFeatureItemProps,
+  ExploreFiltersAccessibilityFeaturesProps,
+  ExploreFiltersFilterListProps,
 } from '@/types/exploreTypes';
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -27,6 +32,7 @@ import {
   FontAwesome5,
 } from '@expo/vector-icons';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+
 export default function ExploreFilters() {
   // State for beds and bathrooms information / 床和浴室信息状态
   const [bedsBathroomsInfo, setBedsBathroomsInfo] =
@@ -267,10 +273,27 @@ export default function ExploreFilters() {
         />
       </View>
 
-      <View style={styles.amenitiesSection}>
+      <View
+        style={[styles.amenitiesSection, { borderBottomColor: border.default }]}
+      >
         {itemTitle({ name: 'Amenities', style: { marginBottom: 4 } })}
         <Amenities />
       </View>
+
+      <View
+        style={[styles.bookingOptions, { borderBottomColor: border.default }]}
+      >
+        {itemTitle({ name: 'Booking options', style: { marginBottom: 4 } })}
+        <BookingOptions />
+      </View>
+
+      <View
+        style={[styles.standoutSection, { borderBottomColor: border.default }]}
+      >
+        {itemTitle({ name: 'Standout stays', style: { marginBottom: 16 } })}
+        <StandoutSectionButton />
+      </View>
+      <FilterBottom />
     </View>
   );
 }
@@ -359,7 +382,7 @@ const BedsBathrooms = ({
           />
         </Pressable>
       </View>
-    </View>
+    </View>  
   );
 };
 
@@ -608,6 +631,89 @@ const Amenities = () => {
   );
 };
 
+// Booking options component / 预订选项组件
+const BookingOptions = () => {
+  const {
+    theme: { border, text },
+  } = useCustomTheme();
+  const [bookingOptions, setBookingOptions] = useState<BookingOptionsProps[]>([
+    {
+      id: 1,
+      name: 'House',
+      icon: 'home',
+      type: 'MaterialCommunityIcons',
+    },
+    {
+      id: 2,
+      name: 'Apartment',
+      icon: 'apartment',
+      type: 'MaterialIcons',
+    },
+    {
+      id: 3,
+      name: 'Guest house',
+      icon: 'other-houses',
+      type: 'MaterialIcons',
+    },
+    {
+      id: 4,
+      name: 'Hotel',
+      icon: 'hotel',
+      type: 'FontAwesome5',
+    },
+  ]);
+  const [selectedBookingOption, setSelectedBookingOption] = useState<
+    Record<string, BookingOptionsProps>
+  >({});
+
+  // Handle booking options press / 处理预订选项点击
+  const handleBookingOptionsPress = useCallback(
+    (bookingOption: BookingOptionsProps) => {
+      setSelectedBookingOption((prev) => {
+        const newState = { ...prev };
+        if (prev[bookingOption.name]) {
+          delete newState[bookingOption.name];
+        } else {
+          newState[bookingOption.name] = bookingOption;
+        }
+        return newState;
+      });
+    },
+    []
+  );
+
+  return (
+    <View
+      style={[styles.bookingOptionsWrapper, { borderColor: border.default }]}
+    >
+      {bookingOptions.map((bookingOption) => (
+        <TouchableWithoutFeedback
+          onPress={() => handleBookingOptionsPress(bookingOption)}
+          style={[
+            styles.bookingOptionsItem,
+            {
+              borderColor: selectedBookingOption[bookingOption.name]
+                ? border.focus
+                : border.default,
+            },
+          ]}
+          key={bookingOption.name}
+        >
+          <AmenitiesIcon
+            type={bookingOption.type as AmenitiesItemIconProps['type']}
+            icon={bookingOption.icon}
+          />
+          <Text
+            style={[styles.bookingOptionsItemTitle, { color: text.primary }]}
+          >
+            {bookingOption.name}
+          </Text>
+        </TouchableWithoutFeedback>
+      ))}
+    </View>
+  );
+};
+
 // Amenities icon component / 设施图标组件
 const AmenitiesIcon = ({
   icon,
@@ -637,6 +743,354 @@ const AmenitiesIcon = ({
   return <IconComponent name={icon as any} size={size} color={color} />;
 };
 
+// Standout section button component / 突出部分按钮组件
+const StandoutSectionButton = () => {
+  const {
+    theme: { text, border },
+  } = useCustomTheme();
+  const [isPressed, setIsPressed] = useState<boolean>(false);
+
+  // Handle standout section button press / 处理突出部分按钮点击
+  const handleStandoutSectionButtonPress = () => {
+    setIsPressed(!isPressed);
+  };
+
+  // Animation value for scale / 缩放动画值
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  // Handle press in animation / 处理按下动画
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.8,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Handle press out animation / 处理松开动画
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+  return (
+    <TouchableWithoutFeedback
+      onPress={handleStandoutSectionButtonPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
+      <Animated.View
+        style={[
+          styles.standoutSectionButton,
+          { borderColor: isPressed ? border.focus : border.default },
+          {
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      >
+        <AmenitiesIcon icon="hands" type="FontAwesome5" />
+        <View>
+          <Text
+            style={[
+              styles.standoutSectionButtonText,
+              { color: text.primary, marginBottom: 4 },
+            ]}
+          >
+            Guest favorite
+          </Text>
+          <Text
+            style={[
+              styles.standoutSectionButtonText,
+              { color: text.secondary },
+            ]}
+          >
+            The most loved homes on Airbnb
+          </Text>
+        </View>
+      </Animated.View>
+    </TouchableWithoutFeedback>
+  );
+};
+
+// Filter bottom component / 底部筛选组件
+const FilterBottom = () => {
+  // Property types state / 物业类型状态
+  const [propertyTypes, setPropertyTypes] = useState<PropertyTypesProps[]>([
+    { id: 1, name: 'House', icon: 'home', type: 'MaterialCommunityIcons' },
+    { id: 2, name: 'Apartment', icon: 'apartment', type: 'MaterialIcons' },
+    { id: 3, name: 'Guest house', icon: 'other-houses', type: 'MaterialIcons' },
+    { id: 4, name: 'Hotel', icon: 'hotel', type: 'FontAwesome5' },
+  ]);
+
+  // Accessibility features state / 无障碍功能状态
+  const [accessibilityFeatures, setAccessibilityFeatures] = useState<
+    ExploreFiltersAccessibilityFeaturesProps[]
+  >([
+    {
+      id: 1,
+      title: 'Guest entrance and parking',
+      list: [
+        { id: 1, name: 'Step-free access', checked: false },
+        { id: 2, name: 'Wheelchair accessible', checked: false },
+        { id: 3, name: 'Elevator', checked: false },
+        { id: 4, name: 'Wheelchair accessible', checked: false },
+        { id: 5, name: 'Doorway width', checked: false },
+        { id: 6, name: 'Disabled parking', checked: false },
+      ],
+    },
+    {
+      id: 2,
+      title: 'Bedrooms',
+      list: [
+        { id: 1, name: 'step-free bedroom', checked: false },
+        { id: 2, name: 'bedside rails', checked: false },
+        { id: 3, name: 'towel rails', checked: false },
+        { id: 4, name: 'shower chair', checked: false },
+        { id: 5, name: 'shower seat', checked: false },
+        { id: 6, name: 'tv remote', checked: false },
+        { id: 7, name: 'air conditioner', checked: false },
+      ],
+    },
+  ]);
+
+  // Selected property types state / 选中的物业类型状态
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<
+    Record<string, PropertyTypesProps>
+  >({});
+
+  // Handle property type press / 处理物业类型点击
+  const handlePropertyTypePress = useCallback(
+    (propertyType: PropertyTypesProps) => {
+      setSelectedPropertyTypes((prev) => {
+        const newState = { ...prev };
+        if (prev[propertyType.name]) {
+          delete newState[propertyType.name];
+        } else {
+          newState[propertyType.name] = propertyType;
+        }
+        return newState;
+      });
+    },
+    []
+  );
+
+  // Handle accessibility feature press / 处理无障碍功能点击
+  const handleAccessibilityFeaturePress = useCallback(
+    (
+      title: string,
+      checkedItem: ExploreFiltersAccessibilityFeatureItemProps
+    ) => {
+      const newAccessibilityFeatures = accessibilityFeatures.map((feature) => ({
+        ...feature,
+        list: feature.list.map((item) => ({
+          ...item,
+          checked:
+            title === feature.title &&
+            checkedItem.id === item.id &&
+            item.name === checkedItem.name
+              ? !item.checked
+              : item.checked,
+        })),
+      }));
+      setAccessibilityFeatures(newAccessibilityFeatures);
+    },
+    [accessibilityFeatures]
+  );
+
+  const filterList: ExploreFiltersFilterListProps[] = useMemo(
+    () => [
+      {
+        id: 1,
+        title: 'Property type',
+        component: (
+          <PropertyTypes
+            propertyTypes={propertyTypes}
+            selectedPropertyTypes={selectedPropertyTypes}
+            handlePropertyTypePress={handlePropertyTypePress}
+          />
+        ),
+      },
+      {
+        id: 2,
+        title: 'Accessibility features',
+        component: (
+          <Feature
+            accessibilityFeatures={accessibilityFeatures}
+            handleAccessibilityFeaturePress={handleAccessibilityFeaturePress}
+          />
+        ),
+      },
+    ],
+    [accessibilityFeatures, propertyTypes, selectedPropertyTypes]
+  );
+
+  return (
+    <View style={styles.filterBottomList}>
+      {filterList.map((item) => (
+        <FilterBottomItem
+          title={item.title}
+          key={item.id}
+          component={item.component}
+        />
+      ))}
+    </View>
+  );
+};
+
+const FilterBottomItem = ({
+  title,
+  component: children,
+}: Omit<ExploreFiltersFilterListProps, 'id'>) => {
+  const {
+    theme: { border, text },
+  } = useCustomTheme();
+  const [expanded, setExpanded] = useState<boolean>(false);
+
+  const toggleExpanded = useCallback(() => {
+    setExpanded((prev) => !prev);
+  }, []);
+
+  const renderHeader = useMemo(
+    () => (
+      <TouchableWithoutFeedback
+        style={styles.filterBottomListItemTop}
+        onPress={toggleExpanded}
+      >
+        <Text
+          style={[styles.filterBottomListItemTopText, { color: text.primary }]}
+        >
+          {title}
+        </Text>
+        <AmenitiesIcon
+          icon={expanded ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
+          type="MaterialIcons"
+        />
+      </TouchableWithoutFeedback>
+    ),
+    [expanded, text.primary, title, toggleExpanded]
+  );
+
+  return (
+    <View
+      style={[
+        styles.filterBottomListItem,
+        { borderBottomColor: border.default },
+      ]}
+    >
+      {renderHeader}
+      {expanded && children}
+    </View>
+  );
+};
+
+// Property types component / 物业类型组件
+const PropertyTypes = ({
+  propertyTypes,
+  selectedPropertyTypes,
+  handlePropertyTypePress,
+}: {
+  propertyTypes: PropertyTypesProps[];
+  selectedPropertyTypes: Record<string, PropertyTypesProps>;
+  handlePropertyTypePress: (propertyType: PropertyTypesProps) => void;
+}) => {
+  const {
+    theme: { text, border },
+  } = useCustomTheme();
+
+  return (
+    <View style={styles.propertyType}>
+      {propertyTypes.map((propertyType) => (
+        <TouchableWithoutFeedback
+          onPress={() => handlePropertyTypePress(propertyType)}
+          style={[
+            styles.propertyTypeItem,
+            {
+              borderColor: selectedPropertyTypes[propertyType.name]
+                ? border.focus
+                : border.default,
+            },
+          ]}
+          key={propertyType.name}
+        >
+          <AmenitiesIcon
+            icon={propertyType.icon}
+            type={propertyType.type as AmenitiesItemIconProps['type']}
+          />
+          <Text style={[styles.propertyTypeItemText, { color: text.primary }]}>
+            {propertyType.name}
+          </Text>
+        </TouchableWithoutFeedback>
+      ))}
+    </View>
+  );
+};
+
+/**
+ * Accessibility features component / 无障碍功能组件
+ * @returns
+ */
+const Feature = ({
+  accessibilityFeatures,
+  handleAccessibilityFeaturePress,
+}: {
+  accessibilityFeatures: ExploreFiltersAccessibilityFeaturesProps[];
+  handleAccessibilityFeaturePress: (
+    title: string,
+    checkedItem: ExploreFiltersAccessibilityFeatureItemProps
+  ) => void;
+}) => {
+  const {
+    theme: { text, border },
+  } = useCustomTheme();
+
+  return (
+    <View style={styles.feature}>
+      <View style={styles.featureList}>
+        {accessibilityFeatures.map((feature) => (
+          <View style={{ flex: 1 }} key={feature.id}>
+            <Text style={[styles.featureItemTitle, { color: text.primary }]}>
+              {feature.title}
+            </Text>
+            <View style={styles.featureItemWrapper}>
+              {feature.list.map((item) => (
+                <TouchableWithoutFeedback
+                  style={[styles.featureItem]}
+                  key={`${item.id}_${item.name}`}
+                  onPress={() =>
+                    handleAccessibilityFeaturePress(feature.title, item)
+                  }
+                >
+                  <Text
+                    style={[styles.featureItemText, { color: text.secondary }]}
+                  >
+                    {item.name}
+                  </Text>
+                  <View
+                    style={[
+                      styles.featureItemCheckbox,
+                      {
+                        backgroundColor: item.checked ? border.focus : 'transparent',
+                      },
+                    ]}
+                  >
+                    {item.checked && (
+                      <MaterialIcons
+                        name="check"
+                        size={20}
+                        color={text.inverse}
+                      />
+                    )}
+                  </View>
+                </TouchableWithoutFeedback>
+              ))}
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
 // Styles / 样式
 const styles = StyleSheet.create({
   container: {
@@ -648,7 +1102,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   itemTitleText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 32, // Text bottom margin / 文本底部外边距
   },
@@ -704,7 +1158,7 @@ const styles = StyleSheet.create({
   },
   filterBedsBathroomsSection: {
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 32,
     borderBottomWidth: 1,
     paddingBottom: 32,
   },
@@ -735,6 +1189,8 @@ const styles = StyleSheet.create({
   amenitiesSection: {
     marginTop: 10,
     marginBottom: 10,
+    paddingBottom: 32,
+    borderBottomWidth: 1,
   },
   amenitiesList: {},
   amenitiesItemWrapper: {
@@ -744,7 +1200,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     fontFamily: 'mon-sb',
-    marginBottom: 12,
+    marginBottom: 24,
   },
   amenitiesItem: {
     flexDirection: 'row',
@@ -779,5 +1235,132 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'mon-sb',
     textDecorationLine: 'underline',
+  },
+  bookingOptions: {
+    marginTop: 10,
+    marginBottom: 32,
+    paddingBottom: 32,
+    borderBottomWidth: 1,
+  },
+  bookingOptionsWrapper: {
+    padding: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 15,
+    marginTop: 24,
+  },
+  bookingOptionsItem: {
+    padding: 10,
+    borderWidth: 1,
+    minWidth: 110,
+    height: 50,
+    borderRadius: 100,
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  bookingOptionsItemTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
+  },
+  standoutSection: {
+    marginTop: 10,
+    marginBottom: 10,
+    paddingBottom: 32,
+    borderBottomWidth: 1,
+  },
+  standoutSectionButton: {
+    padding: 10,
+    borderWidth: 1,
+    minWidth: 110,
+    height: 78,
+    borderRadius: 12,
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  standoutSectionButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
+  },
+  filterBottomList: {},
+  filterBottomListItem: {
+    minHeight: 72,
+  },
+  filterBottomListItemTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 24,
+  },
+  filterBottomListItemTopText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
+  },
+  propertyType: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 15,
+    paddingBottom: 32,
+  },
+  propertyTypeItem: {
+    gap: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 100,
+    paddingHorizontal: 15,
+    height: 50,
+  },
+  propertyTypeItemText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
+  },
+  feature: {
+    paddingBottom: 32,
+  },
+  featureText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
+    marginBottom: 24,
+  },
+  featureList: {
+    gap: 24,
+  },
+  featureItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  featureItemTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
+    marginBottom: 20,
+  },
+  featureItemWrapper: {
+    gap: 20,
+    marginBottom: 20,
+  },
+  featureItemText: {
+    fontSize: 16,
+    fontFamily: 'mon-sb',
+  },
+  featureItemCheckbox: {
+    width: 24,
+    height: 24,
+    borderWidth: Platform.OS === 'ios' ? 1 : 2,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
