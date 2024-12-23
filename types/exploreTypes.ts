@@ -107,6 +107,54 @@ export type AmenitiesItemIconProps = Pick<AmenitiesItemProps,'icon'> & {
     type:AmenitiesItemIconType
 }
 
+/**
+ * Booking Options Props Interface
+ * 预订选项属性接口
+ */
+interface BookingOptionsProps{
+    id:number,
+    name:string,
+    icon:string,
+    type:string
+}
+
+/**
+ * Explore Filters Property Types Props Interface
+ * 探索过滤器物业类型属性接口
+ */
+
+export type PropertyTypesProps = Pick<BookingOptionsProps,'id' | 'name' | 'icon' | 'type'>
+
+/**
+ * Explore Filters Accessibility Features Props Interface
+ * 探索过滤器无障碍功能属性接口
+ */ 
+interface ExploreFiltersAccessibilityFeaturesProps{
+    title:string,
+    id:number,
+    list:ExploreFiltersAccessibilityFeatureItemProps[]
+}
+
+/**
+ * Explore Filters Accessibility Feature Item Props Interface
+ * 探索过滤器无障碍功能项目属性接口
+ */ 
+interface ExploreFiltersAccessibilityFeatureItemProps{
+    id:number,
+    name:string,
+    checked:boolean
+}
+
+/**
+ * Explore Filters Filter List Props Interface
+ * 探索过滤器筛选列表属性接口
+ */
+interface ExploreFiltersFilterListProps {
+    id: number;
+    title: string;
+    component: React.ReactNode;
+}
+
 export type {
     ExploreItemType,
     ExploreListProps,
@@ -117,4 +165,8 @@ export type {
     ExploreFiltersBedsBathroomsOnChangeProps,
     AmenitiesProps,
     AmenitiesItemProps,
+    BookingOptionsProps,
+    ExploreFiltersAccessibilityFeatureItemProps,
+    ExploreFiltersAccessibilityFeaturesProps,
+    ExploreFiltersFilterListProps
 };
