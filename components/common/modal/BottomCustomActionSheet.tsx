@@ -25,11 +25,29 @@
 */
 import { useCustomTheme } from '@/context/themeContext';
 import { Ionicons } from '@expo/vector-icons';
-import React, { forwardRef, useImperativeHandle, useMemo, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Keyboard, KeyboardAvoidingView, Platform, Animated, ScrollView } from 'react-native';
-import { StyleSheet,KeyboardEvent } from 'react-native';
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useEffect,
+} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Animated,
+  ScrollView,
+} from 'react-native';
+import { StyleSheet, KeyboardEvent } from 'react-native';
 import ActionSheet, { ActionSheetRef } from 'react-native-actions-sheet';
-import { BottomCustomActionSheetProps,BottomCustomActionSheetHandle } from '@/types/modalTypes';
+import {
+  BottomCustomActionSheetProps,
+  BottomCustomActionSheetHandle,
+} from '@/types/modalTypes';
 /* 
   Component description:
   A custom bottom action sheet component that extends react-native-actions-sheet.
@@ -61,38 +79,41 @@ const BottomCustomActionSheet = forwardRef<
   BottomCustomActionSheetHandle,
   BottomCustomActionSheetProps
 >((props, ref) => {
-
   // Get theme values from custom theme hook
   // 从自定义主题钩子获取主题值
   const {
     theme: { background, text, border },
   } = useCustomTheme();
-  
+
   // Create a reference to the action sheet
   // 创建一个底部动作面板的引用
-  const actionSheetRef = useRef<ActionSheetRef>(null)
-  const translateY = useRef(new Animated.Value(0)).current
+  const actionSheetRef = useRef<ActionSheetRef>(null);
+  const translateY = useRef(new Animated.Value(0)).current;
 
   // Expose show/hide methods to parent component for external control
   // 向父组件暴露显示/隐藏方法以供外部控制
-  useImperativeHandle(ref,()=>({
-    // Hide the action sheet and call onClose callback
-    // 隐藏底部动作面板并调用 onClose 回调
-    hide:()=>{
-      actionSheetRef.current?.hide()
-      props.onClose?.()
-      Keyboard.dismiss()
-    },
-    // Show the action sheet and call onOpen callback
-    // 显示底部动作面板并调用 onOpen 回调
-    show:()=>{
-     actionSheetRef.current?.show()
-     props.onOpen?.()
-    },
-  }),[])
+  useImperativeHandle(
+    ref,
+    () => ({
+      // Hide the action sheet and call onClose callback
+      // 隐藏底部动作面板并调用 onClose 回调
+      hide: () => {
+        actionSheetRef.current?.hide();
+        props.onClose?.();
+        Keyboard.dismiss();
+      },
+      // Show the action sheet and call onOpen callback
+      // 显示底部动作面板并调用 onOpen 回调
+      show: () => {
+        actionSheetRef.current?.show();
+        props.onOpen?.();
+      },
+    }),
+    []
+  );
 
   // Render the header component with close button and title
-  // 渲染带有关闭按钮和标题的头部组件 
+  // 渲染带有关闭按钮和标题的头部组件
   const actionHeader = () => {
     return (
       <View
@@ -101,13 +122,15 @@ const BottomCustomActionSheet = forwardRef<
           { borderBottomColor: border.default },
         ]}
       >
-        <TouchableOpacity onPress={()=>{
-          actionSheetRef.current?.hide()
-          props.onClose?.()
-        }}> 
+        <TouchableOpacity
+          onPress={() => {
+            actionSheetRef.current?.hide();
+            props.onClose?.();
+          }}
+        >
           <Ionicons name="close" size={24} color={text.primary} />
         </TouchableOpacity>
-        {props.title && ( 
+        {props.title && (
           <Text style={[styles.actionSheetHeaderText, { color: text.primary }]}>
             {props.title}
           </Text>
@@ -117,92 +140,101 @@ const BottomCustomActionSheet = forwardRef<
   };
 
   // Memoize container style to optimize performance
-  // 使用 useMemo 优化性能  
-  const containerStyle = useMemo(()=>{
-      return {
-        backgroundColor: background.paper,
-        height: '30%',
-      }
-    },[background.paper])
+  // 使用 useMemo 优化性能
+  const containerStyle = useMemo(() => {
+    return {
+      backgroundColor: background.paper,
+    };
+  }, [background.paper]);
 
   // Memoize indicator style to optimize performance
-  const indicatorStyle = useMemo(()=>{
+  const indicatorStyle = useMemo(() => {
     return {
       backgroundColor: background.contrast,
-    }
-  },[background.contrast])
+    };
+  }, [background.contrast]);
 
   // Memoize snap points to optimize performance
-  // 使用 useMemo 优化性能  
-  const snapPoints = useMemo(()=>{
-    if(props.snapPoints){
-      return props.snapPoints.map((snapPoint)=>{
-        const num = Number(snapPoint)
-        if(isNaN(num)) return 100
-        return num
-      })
+  // 使用 useMemo 优化性能
+  const snapPoints = useMemo(() => {
+    if (props.snapPoints) {
+      return props.snapPoints.map((snapPoint) => {
+        const num = Number(snapPoint);
+        if (isNaN(num)) return 100;
+        return num;
+      });
     }
-    return [100]
-  },[props.snapPoints])
+    return [100];
+  }, [props.snapPoints]);
 
-  useEffect(()=>{
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow',(e:KeyboardEvent)=>{
-      const keyboardHeight = e.endCoordinates.height
-      Animated.timing(translateY, {
-        toValue: -keyboardHeight,
-        duration: 300,
-        useNativeDriver: true,
-      }).start()
-    })
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      (e: KeyboardEvent) => {
+        const keyboardHeight = e.endCoordinates.height;
+        Animated.timing(translateY, {
+          toValue: -keyboardHeight,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }
+    );
 
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide',(e:KeyboardEvent)=>{
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start()
-    })
-    return ()=>{
-      keyboardDidShowListener.remove()
-      keyboardDidHideListener.remove()
-    }
-  },[])
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      (e: KeyboardEvent) => {
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }
+    );
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   return (
     <View>
       <ActionSheet
-        containerStyle={{...containerStyle as object, ...props.containerStyle as object}}
+        containerStyle={{
+          ...(containerStyle as object),
+          ...(props.containerStyle as object),
+        }}
         indicatorStyle={{
-          ...indicatorStyle as object,
-          ...props.indicatorStyle as object,
+          ...(indicatorStyle as object),
+          ...(props.indicatorStyle as object),
         }}
         keyboardHandlerEnabled={true}
-        gestureEnabled={props.gestureEnabled??true}
+        gestureEnabled={props.gestureEnabled ?? true}
         drawUnderStatusBar={false}
         useBottomSafeAreaPadding={true}
         isModal={true}
         ref={actionSheetRef}
         snapPoints={snapPoints}
-        elevation={props.elevation??5}
-        overlayColor={props.overlayColor??'rgba(0,0,0,0.9)'}
-        defaultOverlayOpacity={props.defaultOverlayOpacity??0.5}
-        closeOnTouchBackdrop={props.closeOnTouchBackdrop??true}
+        elevation={props.elevation ?? 5}
+        overlayColor={props.overlayColor ?? 'rgba(0,0,0,0.9)'}
+        defaultOverlayOpacity={props.defaultOverlayOpacity ?? 0.5}
+        closeOnTouchBackdrop={props.closeOnTouchBackdrop ?? true}
         onClose={() => {
-          props.onClose?.()
-          Keyboard.dismiss()
+          props.onClose?.();
+          Keyboard.dismiss();
         }}
         onBeforeShow={() => {
-          props.onBeforeShow?.()
+          props.onBeforeShow?.();
         }}
         onBeforeClose={() => {
-          props.onBeforeClose?.()
+          props.onBeforeClose?.();
         }}
       >
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        {props.header??actionHeader()}
-         <ScrollView>
+        <KeyboardAvoidingView
+          style={{ flex: 1, minHeight: '100%' }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          {props.header ?? actionHeader()}
           {props.children}
-         </ScrollView>
         </KeyboardAvoidingView>
       </ActionSheet>
     </View>

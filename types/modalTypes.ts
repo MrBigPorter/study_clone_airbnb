@@ -35,6 +35,8 @@ interface BottomCustomActionSheetProps {
     children: React.ReactNode;
     /** Custom header component 自定义头部组件 */
     header?:React.ReactNode;
+    /** Custom footer component 自定义底部组件 */
+    footer?:React.ReactNode;
     /** Callback when sheet opens 面板打开时的回调 */
     onOpen?:()=>void;
     /** Callback when sheet closes 面板关闭时的回调 */

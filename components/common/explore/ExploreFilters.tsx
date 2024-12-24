@@ -12,6 +12,8 @@ import {
   ExploreFiltersAccessibilityFeatureItemProps,
   ExploreFiltersAccessibilityFeaturesProps,
   ExploreFiltersFilterListProps,
+  AmenitiesCheckedProps,
+  BookingOptionsCheckedProps,
 } from '@/types/exploreTypes';
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import {
@@ -21,6 +23,8 @@ import {
   Animated,
   TextStyle,
   Platform,
+  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { PriceRangeSlider } from './PriceRangeSlider';
@@ -33,6 +37,12 @@ import {
 } from '@expo/vector-icons';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
+// 价格范围类型
+interface PriceRange {
+  leftPrice: number;
+  rightPrice: number;
+}
+
 export default function ExploreFilters() {
   // State for beds and bathrooms information / 床和浴室信息状态
   const [bedsBathroomsInfo, setBedsBathroomsInfo] =
@@ -42,9 +52,20 @@ export default function ExploreFilters() {
       bathrooms: 0,
     });
 
+  const [priceRange,setPriceRange] = useState<PriceRange>({leftPrice:0,rightPrice:0});
+  const [checkedAmenities,setCheckedAmenities] = useState<AmenitiesCheckedProps>({});
+  const [checkedBookingOptions,setCheckedBookingOptions] = useState<BookingOptionsCheckedProps>({});  
+  const [standoutSection,setStandoutSection] = useState<boolean>(false);
+  const [filterBottom,setFilterBottom] = useState<{
+    selectedPropertyTypes: Record<string, PropertyTypesProps>;
+    accessibilityFeatures: ExploreFiltersAccessibilityFeaturesProps[];
+  }>({
+    selectedPropertyTypes: {},
+    accessibilityFeatures: [],
+  });
   // Theme colors / 主题颜色
   const {
-    theme: { text, border },
+    theme: { text, border, background },
   } = useCustomTheme();
 
   // Place types data / 地点类型数据
@@ -117,6 +138,34 @@ export default function ExploreFilters() {
     },
     []
   );
+
+  // Handle price change / 处理价格变化
+  const handlePriceChange = ({leftPrice,rightPrice}:{leftPrice:number,rightPrice:number}) => {
+    setPriceRange({leftPrice,rightPrice});
+  };
+
+  // Handle amenities change / 处理设施变化
+  const handleAmenitiesChange = (checkedAmenities: AmenitiesCheckedProps) => {
+    setCheckedAmenities(checkedAmenities);
+  };
+
+  // Handle booking options change / 处理预订选项变化
+  const handleBookingOptionsChange = (checkedBookingOptions: BookingOptionsCheckedProps) => {
+    setCheckedBookingOptions(checkedBookingOptions);
+  };
+
+  // Handle standout section change / 处理突出部分变化
+  const handleStandoutSectionChange = (isPressed: boolean) => {
+    setStandoutSection(isPressed);
+  };
+
+  // Handle filter bottom change / 处理底部过滤器变化
+  const handleFilterBottomChange = (data: {
+    selectedPropertyTypes: Record<string, PropertyTypesProps>;
+    accessibilityFeatures: ExploreFiltersAccessibilityFeaturesProps[];
+  }) => {
+    setFilterBottom(data);
+  };
 
   // Calculate place type item styles / 计算地点类型项目样式
   const usePlaceTypeStyles = (
@@ -200,104 +249,171 @@ export default function ExploreFilters() {
     );
   };
 
+  const collection = useMemo(() => {
+    return {
+        bedsBathroomsInfo,
+        priceRange,
+        checkedAmenities,
+        checkedBookingOptions,
+        standoutSection,  
+        filterBottom
+    }
+  }, [bedsBathroomsInfo,priceRange,checkedAmenities,checkedBookingOptions,standoutSection,filterBottom]);
+
+  console.log('collection', collection);
   return (
     <View style={styles.container}>
-      {/* Filter top section / 过滤器顶部部分 */}
-      <View style={[styles.filterTop, { borderBottomColor: border.default }]}>
-        {itemTitle({ name: 'Type of place' })}
-        <View style={[styles.placeType, { borderColor: border.default }]}>
-          {placeTypes.map((placeType, index) => (
-            <PlaceTypeItem
-              key={placeType.id}
-              index={index}
-              placeType={placeType}
-              currentPlaceType={currentPlaceType}
-              placeTypes={placeTypes}
+      <ScrollView
+        style={{ flex: 1, width: '100%', padding: 34 }}
+        contentContainerStyle={{ flexGrow: 1,paddingBottom:50 }}
+      >
+        <SelectArea collection={collection}/>
+        {/* Filter top section / 过滤器顶部部分 */}
+        <View style={[styles.filterTop, { borderBottomColor: border.default }]}>
+          {itemTitle({ name: 'Type of place' })}
+          <View style={[styles.placeType, { borderColor: border.default }]}>
+            {placeTypes.map((placeType, index) => (
+              <PlaceTypeItem
+                key={placeType.id}
+                index={index}
+                placeType={placeType}
+                currentPlaceType={currentPlaceType}
+                placeTypes={placeTypes}
+              />
+            ))}
+            {/* Animated selection indicator / 动画选择指示器 */}
+            <Animated.View
+              style={[
+                styles.placeTypeInactiveStatus,
+                {
+                  width: widthAnim,
+                  borderColor: border.focus,
+                  left: slideAnim,
+                  transform: [{ scale: scaleAnim }],
+                },
+              ]}
             />
-          ))}
-          {/* Animated selection indicator / 动画选择指示器 */}
-          <Animated.View
-            style={[
-              styles.placeTypeInactiveStatus,
-              {
-                width: widthAnim,
-                borderColor: border.focus,
-                left: slideAnim,
-                transform: [{ scale: scaleAnim }],
-              },
-            ]}
+          </View>
+        </View>
+        {/* Filter middle section / 过滤器中间部分 */}
+        <View
+          style={[styles.filterMiddle, { borderBottomColor: border.default }]}
+        >
+          {itemTitle({ name: 'Price range', style: { marginBottom: 4 } })}
+          <Text style={[styles.priceRangeText, { color: text.secondary }]}>
+            Nightly prices before fees and taxes
+          </Text>
+          <PriceRangeSlider onPriceChange={handlePriceChange} />
+        </View>
+        {/* Filter Beds and Bathrooms section / 过滤器床和浴室部分 */}
+        <View
+          style={[
+            styles.filterBedsBathroomsSection,
+            { borderBottomColor: border.default },
+          ]}
+        >
+          {itemTitle({
+            name: 'Beds and bathrooms',
+            style: { marginBottom: 4 },
+          })}
+          <BedsBathrooms
+            title="Bedrooms"
+            maxNumber={10}
+            minNumber={0}
+            onChange={(value) =>
+              setBedsBathroomsInfo((prev) => ({ ...prev, bedrooms: value }))
+            }
+          />
+          <BedsBathrooms
+            title="Beds"
+            maxNumber={10}
+            minNumber={0}
+            onChange={(value) =>
+              setBedsBathroomsInfo((prev) => ({ ...prev, beds: value }))
+            }
+          />
+          <BedsBathrooms
+            title="Bathrooms"
+            maxNumber={10}
+            minNumber={0}
+            onChange={(value) =>
+              setBedsBathroomsInfo((prev) => ({ ...prev, bathrooms: value }))
+            }
           />
         </View>
-      </View>
-      {/* Filter middle section / 过滤器中间部分 */}
-      <View
-        style={[styles.filterMiddle, { borderBottomColor: border.default }]}
-      >
-        {itemTitle({ name: 'Price range', style: { marginBottom: 4 } })}
-        <Text style={[styles.priceRangeText, { color: text.secondary }]}>
-          Nightly prices before fees and taxes
-        </Text>
-        <PriceRangeSlider />
-      </View>
-      {/* Filter Beds and Bathrooms section / 过滤器床和浴室部分 */}
+
+        <View
+          style={[
+            styles.amenitiesSection,
+            { borderBottomColor: border.default },
+          ]}
+        >
+          {itemTitle({ name: 'Amenities', style: { marginBottom: 4 } })}
+          <Amenities onChange={handleAmenitiesChange}/>
+        </View>
+
+        <View
+          style={[styles.bookingOptions, { borderBottomColor: border.default }]}
+        >
+          {itemTitle({ name: 'Booking options', style: { marginBottom: 4 } })}
+          <BookingOptions onChange={handleBookingOptionsChange} />
+        </View>
+
+        <View
+          style={[
+            styles.standoutSection,
+            { borderBottomColor: border.default },
+          ]}
+        >
+          {itemTitle({ name: 'Standout stays', style: { marginBottom: 16 } })}
+          <StandoutSectionButton onChange={handleStandoutSectionChange} />
+        </View>
+        <FilterBottom onChange={handleFilterBottomChange} />
+      </ScrollView>
       <View
         style={[
-          styles.filterBedsBathroomsSection,
-          { borderBottomColor: border.default },
+          styles.bottomBar,
+          {
+            borderTopColor: border.default,
+            backgroundColor: background.default,
+          },
         ]}
       >
-        {itemTitle({ name: 'Beds and bathrooms', style: { marginBottom: 4 } })}
-        <BedsBathrooms
-          title="Bedrooms"
-          maxNumber={10}
-          minNumber={0}
-          onChange={(value) =>
-            setBedsBathroomsInfo((prev) => ({ ...prev, bedrooms: value }))
-          }
-        />
-        <BedsBathrooms
-          title="Beds"
-          maxNumber={10}
-          minNumber={0}
-          onChange={(value) =>
-            setBedsBathroomsInfo((prev) => ({ ...prev, beds: value }))
-          }
-        />
-        <BedsBathrooms
-          title="Bathrooms"
-          maxNumber={10}
-          minNumber={0}
-          onChange={(value) =>
-            setBedsBathroomsInfo((prev) => ({ ...prev, bathrooms: value }))
-          }
-        />
+        <TouchableOpacity
+          onPress={() => {
+            console.log('Clear all');
+          }}
+        >
+          <Text style={[styles.bottomBarButtonText, { color: text.primary }]}>
+            Clear all
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            console.log('Show 1,000+ places');
+          }}
+          style={[
+            styles.bottomBarButton,
+            { backgroundColor: background.contrast },
+          ]}
+        >
+          <Text style={[styles.bottomBarButtonText, { color: text.inverse }]}>
+            Show 1,000+ places
+          </Text>
+        </TouchableOpacity>
       </View>
-
-      <View
-        style={[styles.amenitiesSection, { borderBottomColor: border.default }]}
-      >
-        {itemTitle({ name: 'Amenities', style: { marginBottom: 4 } })}
-        <Amenities />
-      </View>
-
-      <View
-        style={[styles.bookingOptions, { borderBottomColor: border.default }]}
-      >
-        {itemTitle({ name: 'Booking options', style: { marginBottom: 4 } })}
-        <BookingOptions />
-      </View>
-
-      <View
-        style={[styles.standoutSection, { borderBottomColor: border.default }]}
-      >
-        {itemTitle({ name: 'Standout stays', style: { marginBottom: 16 } })}
-        <StandoutSectionButton />
-      </View>
-      <FilterBottom />
     </View>
   );
 }
 
+const SelectArea = <T extends Record<string,any>>(collection: T) => {
+  console.log('collection===>',collection);
+  return (
+    <View style={styles.selectArea}>
+
+    </View>
+  )
+}
 // Beds and bathrooms component / 床和浴室组件
 // This component handles the beds and bathrooms selection UI / 该组件处理床和浴室选择的用户界面
 // It allows users to increment/decrement the count within min/max bounds / 允许用户在最小/最大范围内增加/减少数量
@@ -382,12 +498,13 @@ const BedsBathrooms = ({
           />
         </Pressable>
       </View>
-    </View>  
+    </View>
   );
 };
 
 // Amenities component / 设施组件
-const Amenities = () => {
+
+const Amenities = ({onChange}: {onChange: (checkedAmenities: AmenitiesCheckedProps) => void}) => {
   const {
     theme: { text },
   } = useCustomTheme();
@@ -522,9 +639,7 @@ const Amenities = () => {
   const [showMore, setShowMore] = useState<boolean>(false);
   // First Record<string, ...> represents amenities categories (e.g. "Location", "Safety") as keys
   // Second Record<string, ...> represents amenity names (e.g. "Near the beach", "Smoke alarm") as keys mapping to their properties
-  const [checkedAmenities, setCheckedAmenities] = useState<
-    Record<string, Record<string, Partial<AmenitiesItemProps>>>
-  >({});
+  const [checkedAmenities, setCheckedAmenities] = useState<AmenitiesCheckedProps>({});
 
   const {
     theme: { border },
@@ -571,6 +686,10 @@ const Amenities = () => {
     },
     [checkedAmenities]
   );
+
+  useEffect(()=>{
+    onChange && onChange(checkedAmenities);
+  },[checkedAmenities])
 
   return (
     <View style={styles.amenitiesList}>
@@ -632,7 +751,11 @@ const Amenities = () => {
 };
 
 // Booking options component / 预订选项组件
-const BookingOptions = () => {
+const BookingOptions = ({
+  onChange
+}: {
+  onChange: (checkedBookingOptions: BookingOptionsCheckedProps) => void
+}) => {
   const {
     theme: { border, text },
   } = useCustomTheme();
@@ -663,7 +786,7 @@ const BookingOptions = () => {
     },
   ]);
   const [selectedBookingOption, setSelectedBookingOption] = useState<
-    Record<string, BookingOptionsProps>
+    BookingOptionsCheckedProps
   >({});
 
   // Handle booking options press / 处理预订选项点击
@@ -681,6 +804,10 @@ const BookingOptions = () => {
     },
     []
   );
+
+  useEffect(()=>{
+    onChange && onChange(selectedBookingOption);
+  },[selectedBookingOption])  
 
   return (
     <View
@@ -744,7 +871,11 @@ const AmenitiesIcon = ({
 };
 
 // Standout section button component / 突出部分按钮组件
-const StandoutSectionButton = () => {
+const StandoutSectionButton = ({
+  onChange
+}: {
+  onChange: (checkedStandoutSection: boolean) => void
+}) => {
   const {
     theme: { text, border },
   } = useCustomTheme();
@@ -753,6 +884,7 @@ const StandoutSectionButton = () => {
   // Handle standout section button press / 处理突出部分按钮点击
   const handleStandoutSectionButtonPress = () => {
     setIsPressed(!isPressed);
+    onChange && onChange(!isPressed);
   };
 
   // Animation value for scale / 缩放动画值
@@ -813,7 +945,17 @@ const StandoutSectionButton = () => {
 };
 
 // Filter bottom component / 底部筛选组件
-const FilterBottom = () => {
+const FilterBottom = ({
+  onChange
+}: {
+  onChange: ({
+    selectedPropertyTypes,
+    accessibilityFeatures,
+  }: {
+    selectedPropertyTypes: Record<string, PropertyTypesProps>;
+    accessibilityFeatures: ExploreFiltersAccessibilityFeaturesProps[];
+  }) => void
+}) => {
   // Property types state / 物业类型状态
   const [propertyTypes, setPropertyTypes] = useState<PropertyTypesProps[]>([
     { id: 1, name: 'House', icon: 'home', type: 'MaterialCommunityIcons' },
@@ -923,6 +1065,13 @@ const FilterBottom = () => {
     ],
     [accessibilityFeatures, propertyTypes, selectedPropertyTypes]
   );
+
+  useEffect(()=>{
+    onChange && onChange({
+      selectedPropertyTypes,
+      accessibilityFeatures
+    });
+  },[selectedPropertyTypes,accessibilityFeatures])
 
   return (
     <View style={styles.filterBottomList}>
@@ -1069,7 +1218,9 @@ const Feature = ({
                     style={[
                       styles.featureItemCheckbox,
                       {
-                        backgroundColor: item.checked ? border.focus : 'transparent',
+                        backgroundColor: item.checked
+                          ? border.focus
+                          : 'transparent',
                       },
                     ]}
                   >
@@ -1094,7 +1245,8 @@ const Feature = ({
 // Styles / 样式
 const styles = StyleSheet.create({
   container: {
-    padding: 34, // Container padding / 容器内边距
+    flex: 1,
+    width: '100%',
   },
   filterTop: {
     paddingBottom: 32, // Top section bottom padding / 顶部部分底部内边距
@@ -1362,5 +1514,40 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  bottomBar: {
+    height: 80,
+    paddingHorizontal: 34,
+    borderTopWidth: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  bottomBarText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
+  },
+  bottomBarButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    height: 50,
+    minWidth: 150,
+    paddingHorizontal: 15,
+  },
+  bottomBarButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
+  },
+  selectArea: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+   
   },
 });

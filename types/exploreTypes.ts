@@ -91,6 +91,12 @@ interface AmenitiesItemProps{
     type:string
 }
 
+interface AmenitiesCheckedProps{
+    [key:string]:{
+        [key:string]:Partial<AmenitiesItemProps>
+    }
+}
+
 /**
  * Amenities Item Icon Type
  * 设施项目图标类型
@@ -116,6 +122,14 @@ interface BookingOptionsProps{
     name:string,
     icon:string,
     type:string
+}
+
+/**
+ * Booking Options Checked Props Interface
+ * 预订选项选中属性接口
+ */
+interface BookingOptionsCheckedProps{
+    [key:string]:Partial<BookingOptionsProps>
 }
 
 /**
@@ -168,5 +182,7 @@ export type {
     BookingOptionsProps,
     ExploreFiltersAccessibilityFeatureItemProps,
     ExploreFiltersAccessibilityFeaturesProps,
-    ExploreFiltersFilterListProps
+    ExploreFiltersFilterListProps,
+    AmenitiesCheckedProps,
+    BookingOptionsCheckedProps
 };

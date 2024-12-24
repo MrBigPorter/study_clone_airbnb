@@ -1,13 +1,16 @@
 // 价格范围滑块组件 - 用于选择价格区间
 // Price Range Slider Component - Used for selecting price range
 import { useCustomTheme } from '@/context/themeContext';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Animated, PanResponder, Text, Platform } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 
+interface PriceRangeSliderProps {
+   onPriceChange:({leftPrice,rightPrice}:{leftPrice:number,rightPrice:number})=>void
+}
 
-export const PriceRangeSlider = () => {
+export const PriceRangeSlider = ({ onPriceChange }: PriceRangeSliderProps) => {
   // 使用主题上下文获取背景和边框颜色
   // Use theme context to get background and border colors
   const {
@@ -139,7 +142,6 @@ export const PriceRangeSlider = () => {
         updateThumbPositions(leftPrice,price);
       }
     } 
-
     },[leftPrice,rightPrice])
 
     // 处理左滑块价格输入
@@ -166,6 +168,9 @@ export const PriceRangeSlider = () => {
    },[sliderWidth,thumbWidth,MAX_PRICE])
 
  
+   useEffect(()=>{
+    onPriceChange && onPriceChange({leftPrice,rightPrice});
+   },[leftPrice,rightPrice])
   return (
     <View>
       {/* 直方图容器 - 显示价格分布 
