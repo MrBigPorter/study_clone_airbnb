@@ -92,9 +92,7 @@ interface AmenitiesItemProps{
 }
 
 interface AmenitiesCheckedProps{
-    [key:string]:{
-        [key:string]:Partial<AmenitiesItemProps>
-    }
+     [key:string]:Partial<AmenitiesItemProps>&{parent?:string}
 }
 
 /**
@@ -129,7 +127,7 @@ interface BookingOptionsProps{
  * 预订选项选中属性接口
  */
 interface BookingOptionsCheckedProps{
-    [key:string]:Partial<BookingOptionsProps>
+    [key:string]:Partial<BookingOptionsProps>&{parent?:string}
 }
 
 /**
@@ -138,6 +136,13 @@ interface BookingOptionsCheckedProps{
  */
 
 export type PropertyTypesProps = Pick<BookingOptionsProps,'id' | 'name' | 'icon' | 'type'>
+
+/**
+ * Explore Filters Selected Filter Bottom Props Interface
+ * 探索过滤器选中筛选底部属性接口
+ */
+export type SelectedFilterBottomProps = Record<string,PropertyTypesProps>
+
 
 /**
  * Explore Filters Accessibility Features Props Interface
@@ -150,13 +155,20 @@ interface ExploreFiltersAccessibilityFeaturesProps{
 }
 
 /**
+ * Explore Filters Accessibility Features Checked Props Interface
+ * 探索过滤器无障碍功能选中属性接口
+ */
+interface ExploreFiltersAccessibilityFeaturesCheckedProps{
+    [key:string]:Partial<ExploreFiltersAccessibilityFeatureItemProps>&{parent?:string}
+}
+
+/**
  * Explore Filters Accessibility Feature Item Props Interface
  * 探索过滤器无障碍功能项目属性接口
  */ 
 interface ExploreFiltersAccessibilityFeatureItemProps{
     id:number,
     name:string,
-    checked:boolean
 }
 
 /**
@@ -167,6 +179,30 @@ interface ExploreFiltersFilterListProps {
     id: number;
     title: string;
     component: React.ReactNode;
+}
+
+/**
+ * Price Range Props Interface
+ * 价格范围属性接口
+ */
+interface PriceRange {
+    leftPrice: number;
+    rightPrice: number;
+    connectPrice?:string
+  }
+
+export type ObjectToList<T> = {
+    keyWord: keyof T;
+    value: T[keyof T];
+  };
+  
+/**
+ * Explore Filters Cache Props Interface
+ * 探索过滤器缓存属性接口
+ */ 
+interface ExploreFiltersCacheProps {
+  keyWord: string;
+  value: any;
 }
 
 export type {
@@ -184,5 +220,8 @@ export type {
     ExploreFiltersAccessibilityFeaturesProps,
     ExploreFiltersFilterListProps,
     AmenitiesCheckedProps,
-    BookingOptionsCheckedProps
+    BookingOptionsCheckedProps,
+    PriceRange,
+    ExploreFiltersAccessibilityFeaturesCheckedProps,
+    ExploreFiltersCacheProps
 };

@@ -82,6 +82,7 @@ export const PriceRangeSlider = ({ onPriceChange }: PriceRangeSliderProps) => {
             // Ensure minimum gap with right price
             if (newLeftPrice <= rightPrice - MIN_PRICE_GAP) {
               setLeftPrice(newLeftPrice);
+              onPriceChange && onPriceChange({leftPrice:newLeftPrice,rightPrice});
               value.setValue(snappedValue);
             }
           } else {
@@ -106,8 +107,9 @@ export const PriceRangeSlider = ({ onPriceChange }: PriceRangeSliderProps) => {
             // Ensure minimum gap with left price
             if (newRightPrice >= leftPrice + MIN_PRICE_GAP) {
               setRightPrice(newRightPrice);
-              value.setValue(snappedValue);
-            }
+                value.setValue(snappedValue);
+                onPriceChange && onPriceChange({leftPrice,rightPrice:newRightPrice});
+              }
           }
         },
       });
@@ -135,11 +137,13 @@ export const PriceRangeSlider = ({ onPriceChange }: PriceRangeSliderProps) => {
       if(price<rightPrice -  MIN_PRICE_GAP){
         setLeftPrice(price);
         updateThumbPositions(price,rightPrice);
+        onPriceChange && onPriceChange({leftPrice:price,rightPrice});
       }
     }else{
       if(price>leftPrice + MIN_PRICE_GAP){
         setRightPrice(price);
         updateThumbPositions(leftPrice,price);
+        onPriceChange && onPriceChange({leftPrice,rightPrice:price});
       }
     } 
     },[leftPrice,rightPrice])
@@ -155,8 +159,6 @@ export const PriceRangeSlider = ({ onPriceChange }: PriceRangeSliderProps) => {
     },[handlePriceInput])
     
 
-
-
   // 更新滑块位置
   // Update thumb positions
   const updateThumbPositions = useCallback((leftPrice:number,rightPrice:number) => {
@@ -167,10 +169,6 @@ export const PriceRangeSlider = ({ onPriceChange }: PriceRangeSliderProps) => {
     rightThumbX.setValue(rightPosition);
    },[sliderWidth,thumbWidth,MAX_PRICE])
 
- 
-   useEffect(()=>{
-    onPriceChange && onPriceChange({leftPrice,rightPrice});
-   },[leftPrice,rightPrice])
   return (
     <View>
       {/* 直方图容器 - 显示价格分布 
