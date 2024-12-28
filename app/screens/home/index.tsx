@@ -21,6 +21,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { ActionSheetRef } from 'react-native-actions-sheet';
 import BottomCustomActionSheet from '@/components/common/modal/BottomCustomActionSheet';
 import ExploreFilters from '@/components/common/explore/ExploreFilters';
+import { ExploreFilterProvider } from '@/context/exploreFilterContext';
 /**
  * Home Screen Component
  * 首页屏幕组件
@@ -103,29 +104,31 @@ export default function Home() {
         3. 这种层序为所有交互元素创建了正确的z-index堆叠
       */}
 
-      <Map />
+      <ExploreFilterProvider>
+        <Map />
 
-      {/* Floating map button with scroll-based animation */}
-      {/* 带有基于滚动的动画效果的浮动地图按钮 */}
-      <MapButton onOpen={onOpen} scrollY={scrollY} />
+        {/* Floating map button with scroll-based animation */}
+        {/* 带有基于滚动的动画效果的浮动地图按钮 */}
+        <MapButton onOpen={onOpen} scrollY={scrollY} />
 
-      {/* Bottom sheet modal containing the explore list */}
-      {/* 包含探索列表的底部表单模态框 */}
-      <BottomSheetCustomModal
-        ref={bottomSheetRef}
-        animatedPositionValue={animatedPositionValue}
-      >
-        <ExploreList ref={exploreListRef} onScroll={handleScroll} />
-      </BottomSheetCustomModal>
+        {/* Bottom sheet modal containing the explore list */}
+        {/* 包含探索列表的底部表单模态框 */}
+        <BottomSheetCustomModal
+          ref={bottomSheetRef}
+          animatedPositionValue={animatedPositionValue}
+        >
+          <ExploreList ref={exploreListRef} onScroll={handleScroll} />
+        </BottomSheetCustomModal>
 
-      <BottomCustomActionSheet
-        containerStyle={{ height: '95%' }}
-        gestureEnabled={false}
-        title="Filter"
-        ref={bottomFilterActionSheetRef}
-      >
-        <ExploreFilters />
-      </BottomCustomActionSheet>
+        <BottomCustomActionSheet
+          containerStyle={{ height: '95%' }}
+          gestureEnabled={false}
+          title="Filter"
+          ref={bottomFilterActionSheetRef}
+        >
+          <ExploreFilters />
+        </BottomCustomActionSheet>
+      </ExploreFilterProvider>
     </View>
   );
 }
