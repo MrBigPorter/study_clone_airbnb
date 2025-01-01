@@ -1,21 +1,26 @@
 // 价格范围滑块组件 - 用于选择价格区间
 // Price Range Slider Component - Used for selecting price range
+import { useExploreFilterContext } from '@/context/exploreFilterContext';
 import { useCustomTheme } from '@/context/themeContext';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PriceRange } from '@/types/exploreTypes';
+import { isNullOrEmpty } from '@/utils';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, Animated, PanResponder, Text, Platform } from 'react-native';
 import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 
 interface PriceRangeSliderProps {
+   value:PriceRange
    onPriceChange:({leftPrice,rightPrice}:{leftPrice:number,rightPrice:number})=>void
 }
 
-export const PriceRangeSlider = ({ onPriceChange }: PriceRangeSliderProps) => {
+export const PriceRangeSlider = ({ onPriceChange,value }: PriceRangeSliderProps) => {
   // 使用主题上下文获取背景和边框颜色
   // Use theme context to get background and border colors
   const {
     theme: { background, border,text },
   } = useCustomTheme();
+  const { cacheFilter } = useExploreFilterContext();
 
   // 直方图数据 - 展示价格分布情况
   // Histogram data - Shows price distribution
@@ -169,6 +174,23 @@ export const PriceRangeSlider = ({ onPriceChange }: PriceRangeSliderProps) => {
     rightThumbX.setValue(rightPosition);
    },[sliderWidth,thumbWidth,MAX_PRICE])
 
+
+  useEffect(() => {
+    const newCacheFilter = cacheFilter.find(item => item.parent === 'priceRange');
+    const newPriceRange = newCacheFilter?.value as PriceRange;  
+    if (!isNullOrEmpty(newCacheFilter) && newPriceRange && newPriceRange.connectPrice) {
+      if(!newCacheFilter?.move){  
+        setLeftPrice(newPriceRange.leftPrice);
+        setRightPrice(newPriceRange.rightPrice);
+        return updateThumbPositions(newPriceRange.leftPrice,newPriceRange.rightPrice);
+      }
+      setLeftPrice(MIN_PRICE);
+      setRightPrice(MAX_PRICE);
+      updateThumbPositions(MIN_PRICE,MAX_PRICE);
+    }
+  }, [cacheFilter,sliderWidth,thumbWidth]);
+
+  
   return (
     <View>
       {/* 直方图容器 - 显示价格分布 

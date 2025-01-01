@@ -1,8 +1,10 @@
 import { useCustomTheme } from "@/context/themeContext";
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ExploreFiltersBedsBathroomsOnChangeProps } from "@/types/exploreTypes";
+import { useExploreFilterContext } from "@/context/exploreFilterContext";
+import { isNullOrEmpty } from "@/utils";
 
 // Beds and bathrooms component / 床和浴室组件
 // This component handles the beds and bathrooms selection UI / 该组件处理床和浴室选择的用户界面
@@ -11,18 +13,23 @@ const BedsBathrooms = ({
   title,
   maxNumber,
   minNumber,
+  value,
   onChange,
 }: ExploreFiltersBedsBathroomsOnChangeProps) => {
   const {
     theme: { text },  
   } = useCustomTheme();
 
+  const {cacheFilter} = useExploreFilterContext();  
+
   // State for the count / 计数状态
   const [count, setCount] = useState<number>(0);
 
   // Check if the count is any / 检查计数是否为任何
-  const isAny = count === 0;
-  // Check if the count is at the minimum / 检查计数���否在最小值
+  const isAny = useMemo(()=>{
+    return count === 0;
+  },[count]);
+  // Check if the count is at the minimum / 检查计数否在最小值
   const isAtMin = count <= minNumber;
   // Check if the count is at the maximum / 检查计数是否在最大值
   const isAtMax = count >= maxNumber;
@@ -64,6 +71,19 @@ const BedsBathrooms = ({
     add: handleIncrement,
     remove: handleDecrement,
   };
+
+  useEffect(() => {
+    if(title){ 
+        const newCacheFilter = cacheFilter.find(item => item.keyWord === title.toLowerCase());
+        if(!isNullOrEmpty(newCacheFilter) && !newCacheFilter?.move){
+          setCount(newCacheFilter?.value as number)
+        }else{
+          setCount(0);
+        }
+      }
+  }, [cacheFilter,title]);
+
+
   return (
     <View style={styles.bedsBathrooms}>
       <Text style={[styles.bedsBathroomsTitle, { color: text.tertiary }]}>

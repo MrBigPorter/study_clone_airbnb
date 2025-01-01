@@ -67,6 +67,8 @@ interface BottomCustomActionSheetProps {
     title?:string;
     /** Enable/disable keyboard handler 启用/禁用键盘处理 */
     keyboardHandlerEnabled?: boolean;
+    /** Visibility of the action sheet 动作面板的显示状态 */
+    isVisible?: boolean;
 }
 
 /**

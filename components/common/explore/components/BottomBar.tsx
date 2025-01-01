@@ -3,11 +3,14 @@ import { useCustomTheme } from '@/context/themeContext';
 import { useExploreFilterContext } from '@/context/exploreFilterContext';
 import { useMemo } from 'react';
 import { isNullOrEmpty } from '@/utils';
-import { ExploreFiltersCacheProps, ObjectToList } from '@/types/exploreTypes';
-
+import {
+  ExploreFilterItemProps,
+  FilterValue,
+  PriceRange,
+} from '@/types/exploreTypes';
 
 // Bottom bar component / 底部栏组件
-const BottomBar = () => {
+const BottomBar = ({ onClose }: { onClose: () => void }) => {
   const {
     theme: { border, text, background },
   } = useCustomTheme();
@@ -20,12 +23,11 @@ const BottomBar = () => {
     standoutSection,
     selectedAccessibilityFeatures,
     selectedPropertyTypes,
-    cacheFilter,
   } = useExploreFilterContext();
 
   const getListByObject = <T extends Record<string, any>>(
     obj: T
-  ): ObjectToList<T>[] => {
+  ): ExploreFilterItemProps<FilterValue>[] => {
     if (isNullOrEmpty(obj)) return [];
     return Object.keys(obj).map((key) => {
       let value = obj[key];
@@ -49,7 +51,7 @@ const BottomBar = () => {
       {
         parent: 'priceRange',
         keyWord: 'connectPrice',
-        value: priceRange.connectPrice || '',
+        value: priceRange,
       },
       {
         keyWord: 'standoutSection',
@@ -60,7 +62,12 @@ const BottomBar = () => {
       ...newCheckedBookingOptions,
       ...newSelectedAccessibilityFeatures,
       ...newSelectedPropertyTypes,
-    ].filter((item) => !isNullOrEmpty(item.value));
+    ].filter((item) => {
+      if(item.parent === 'priceRange' && !isNullOrEmpty(item.value)){
+        return (item.value as PriceRange).connectPrice;
+      }
+      return !isNullOrEmpty(item.value);
+    });
     return flattenedList;
   }, [
     { ...bedsBathroomsInfo },
@@ -79,8 +86,11 @@ const BottomBar = () => {
 
   // Show results button / 显示结果按钮
   const handleShowResults = () => {
-    console.log('Show 1,000+ places', newList);
-    dispatch({ type: 'SET_CACHE_FILTER', payload: newList as ExploreFiltersCacheProps[] });
+    dispatch({
+      type: 'SET_CACHE_FILTER',
+      payload: newList,
+    });
+    onClose?.();
   };
 
   return (

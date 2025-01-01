@@ -6,7 +6,9 @@ import {
   BookingOptionsCheckedProps,
   SelectedFilterBottomProps,
   ExploreFiltersAccessibilityFeaturesCheckedProps,
-  ExploreFiltersCacheProps
+  FilterArrayList,
+  ExploreFilterItemProps,
+  FilterValue
 } from '@/types/exploreTypes';
 import {
   createContext,
@@ -24,7 +26,8 @@ interface ExploreFilterContextType {
   standoutSection: string;
   selectedPropertyTypes: SelectedFilterBottomProps;
   selectedAccessibilityFeatures: ExploreFiltersAccessibilityFeaturesCheckedProps;
-  cacheFilter: ExploreFiltersCacheProps[];
+  cacheFilter: FilterArrayList;
+  isVisibleExploreList: boolean;
   dispatch: React.Dispatch<ExploreFilterAction>;
 }
 
@@ -37,8 +40,15 @@ type ExploreFilterAction =
   | { type: 'SET_SELECTED_PROPERTY_TYPES'; payload: SelectedFilterBottomProps }
   | { type: 'SET_ACCESSIBILITY_FEATURES'; payload: ExploreFiltersAccessibilityFeaturesCheckedProps }
   | { type: 'LOAD_STATE'; payload: ExploreFilterState }
-  | { type: 'SET_CACHE_FILTER'; payload: ExploreFiltersCacheProps[] };
+  | { type: 'SET_CACHE_FILTER'; payload: FilterArrayList }
+  | { type: 'UPDATE_CACHE_FILTER'; payload: FilterArrayList }
+  | { type: 'SET_IS_VISIBLE_EXPLORE_LIST'; payload: boolean };
 
+
+/**
+ * Explore Filter State Interface
+ * 探索过滤器状态接口
+ */
 interface ExploreFilterState {
   bedsBathroomsInfo: ExploreFiltersBedsBathroomsProps;
   priceRange: PriceRange;
@@ -48,7 +58,8 @@ interface ExploreFilterState {
   selectedPropertyTypes: SelectedFilterBottomProps;  
   selectedAccessibilityFeatures: ExploreFiltersAccessibilityFeaturesCheckedProps;
   isLoading: boolean;
-  cacheFilter: ExploreFiltersCacheProps[];
+  cacheFilter: FilterArrayList;
+  isVisibleExploreList: boolean;
 }
 
 const STORAGE_KEY = '@explore_filters';
@@ -71,6 +82,7 @@ const initialState: ExploreFilterState = {
   selectedAccessibilityFeatures: {},
   isLoading: true,
   cacheFilter: [],
+  isVisibleExploreList: false,
 };
 
 function exploreFilterReducer(
@@ -126,6 +138,16 @@ function exploreFilterReducer(
         ...state,
         cacheFilter: action.payload,
       };
+    case 'UPDATE_CACHE_FILTER':
+      return {
+        ...state,
+        cacheFilter:action.payload,
+      };
+    case 'SET_IS_VISIBLE_EXPLORE_LIST':
+      return {
+        ...state,
+        isVisibleExploreList: action.payload,
+      };
     default:
       return state;
   }
@@ -140,6 +162,7 @@ const ExploreFilterContext = createContext<ExploreFilterContextType>({
   selectedPropertyTypes: initialState.selectedPropertyTypes,     
   selectedAccessibilityFeatures: initialState.selectedAccessibilityFeatures,  
   cacheFilter: initialState.cacheFilter,
+  isVisibleExploreList: initialState.isVisibleExploreList,
   dispatch: () => null,
 });
 
@@ -189,6 +212,7 @@ export const ExploreFilterProvider = ({
     selectedPropertyTypes: state.selectedPropertyTypes,
     selectedAccessibilityFeatures: state.selectedAccessibilityFeatures,
     cacheFilter: state.cacheFilter,
+    isVisibleExploreList: state.isVisibleExploreList,
     dispatch, 
   };
 

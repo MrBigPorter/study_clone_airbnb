@@ -1,16 +1,18 @@
 import { useCustomTheme } from "@/context/themeContext";
 import { useExploreFilterContext } from "@/context/exploreFilterContext";
-import { BookingOptionsProps } from "@/types/exploreTypes";
-import { useCallback, useState } from "react";
+import { AmenitiesItemProps, BookingOptionsProps } from "@/types/exploreTypes";
+import { useCallback, useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import AmenitiesIcon from "./AmenitiesIcon";
 import { AmenitiesItemIconProps } from "@/types/exploreTypes";
+import { isNullOrEmpty } from "@/utils";
 
 // Booking options component / 预订选项组件
 const BookingOptions = () => {
     const {
       theme: { border, text },
     } = useCustomTheme();
+    const {cacheFilter} = useExploreFilterContext();    
     const { checkedBookingOptions, dispatch } = useExploreFilterContext();
     const [bookingOptions, setBookingOptions] = useState<BookingOptionsProps[]>([
       {
@@ -52,6 +54,25 @@ const BookingOptions = () => {
       },
       []
     );
+
+    useEffect(()=>{
+      if(!isNullOrEmpty(cacheFilter)){
+        const newCacheFilter = cacheFilter.filter(item=> ['bookingOptions'].includes((item.value as AmenitiesItemProps).parent as string));
+        if(!isNullOrEmpty(newCacheFilter)){
+          newCacheFilter.forEach(item=>{
+            if(item.move){  
+              delete checkedBookingOptions[item.keyWord];
+            }else{
+              checkedBookingOptions[item.keyWord] = item.value as AmenitiesItemProps
+            }
+          })
+          dispatch({ 
+            type: 'SET_CHECKED_BOOKING_OPTIONS',
+            payload: checkedBookingOptions,
+          });
+        }
+      }
+    },[cacheFilter]);
   
     return (
       <View

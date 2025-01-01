@@ -1,27 +1,22 @@
 import {
   View,
   SafeAreaView,
-  Text,
-  Dimensions,
-  Button,
-  Pressable,
 } from 'react-native';
 import SearchHeader from '@/components/common/searchHeader';
 import CategoryList from '@/components/common/CategoryList';
 import ExploreList from '@/components/common/explore/ExploreList';
-import { Stack } from 'expo-router';
+import { Stack, useFocusEffect } from 'expo-router';
 import { useCustomTheme } from '@/context/themeContext';
 import { Platform, StyleSheet } from 'react-native';
 import MapButton from '@/components/common/MapButton';
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, } from 'react';
 import BottomSheetCustomModal from '@/components/common/modal/BottomSheet';
 import Map from '@/components/common/Map';
 import BottomSheet, { BottomSheetFlatListMethods } from '@gorhom/bottom-sheet';
 import { useSharedValue } from 'react-native-reanimated';
-import { ActionSheetRef } from 'react-native-actions-sheet';
 import BottomCustomActionSheet from '@/components/common/modal/BottomCustomActionSheet';
 import ExploreFilters from '@/components/common/explore/ExploreFilters';
-import { ExploreFilterProvider } from '@/context/exploreFilterContext';
+import { useExploreFilterContext } from '@/context/exploreFilterContext';
 /**
  * Home Screen Component
  * 首页屏幕组件
@@ -39,8 +34,8 @@ export default function Home() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const animatedPositionValue = useSharedValue(0);
 
-  const bottomFilterActionSheetRef = useRef<ActionSheetRef>(null);
-
+  const [isVisibleExploreList, setIsVisibleExploreList] = useState(false);
+  const {dispatch, cacheFilter} = useExploreFilterContext();
   // Track scroll position for map button animation
   // 跟踪滚动位置以实现地图按钮动画
   const [scrollY, setScrollY] = useState(0);
@@ -70,27 +65,46 @@ export default function Home() {
     if (isPressed) {
       // 打开过滤弹窗
       //setIsFilterModalVisible(true)
-      bottomFilterActionSheetRef.current?.show();
+      setIsVisibleExploreList(true);
     }
+  };
+
+  // Handle filter modal close
+  // 处理过滤弹窗关闭 
+  const handleFilterClose = useCallback(() => {
+    setIsVisibleExploreList(false);
+  }, []) ;
+
+  // Clear filters when navigating away from screen
+  // 离开页面时清除过滤器
+  useFocusEffect(
+    useCallback(() => {
+      dispatch({ type: 'SET_CACHE_FILTER', payload: [] });
+    }, [])
+  );
+
+
+  const HeaderComponent = () => {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <SearchHeader cacheFilter={cacheFilter}  onFilterPress={handleFilterPress} />
+        <CategoryList />
+      </SafeAreaView>
+    );
   };
 
   return (
     <View style={[styles.container, { backgroundColor: background.default }]}>
       {/* Configure stack screen header with search and categories */}
       {/* 配置包含搜索和分类的堆栈屏幕头部 */}
-      <Stack.Screen
-        options={{
-          header: () => (
-            <SafeAreaView style={styles.safeArea}>
-              <SearchHeader onFilterPress={handleFilterPress} />
-              <CategoryList />
-            </SafeAreaView>
-          ),
-        }}
-      />
+        <Stack.Screen
+          options={{
+            header:HeaderComponent,
+          }}
+        />
 
-      {/* Map component */}
-      {/* 
+        {/* Map component */}
+        {/* 
         The Map component is positioned between the bottom sheet modal and floating map button.
         This order is important because:
         1. The map needs to be below the floating button so the button remains clickable
@@ -104,7 +118,6 @@ export default function Home() {
         3. 这种层序为所有交互元素创建了正确的z-index堆叠
       */}
 
-      <ExploreFilterProvider>
         <Map />
 
         {/* Floating map button with scroll-based animation */}
@@ -121,14 +134,16 @@ export default function Home() {
         </BottomSheetCustomModal>
 
         <BottomCustomActionSheet
+          isVisible={isVisibleExploreList}
+          onClose={() => {
+            setIsVisibleExploreList(false);
+          }}
           containerStyle={{ height: '95%' }}
           gestureEnabled={false}
           title="Filter"
-          ref={bottomFilterActionSheetRef}
         >
-          <ExploreFilters />
+          <ExploreFilters onClose={handleFilterClose} />
         </BottomCustomActionSheet>
-      </ExploreFilterProvider>
     </View>
   );
 }

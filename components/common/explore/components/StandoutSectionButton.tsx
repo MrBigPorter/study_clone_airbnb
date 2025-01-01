@@ -1,16 +1,17 @@
 import { useCustomTheme } from "@/context/themeContext";
 import { useExploreFilterContext } from "@/context/exploreFilterContext";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Animated, View, Text, StyleSheet, Pressable } from "react-native";
 import AmenitiesIcon from "./AmenitiesIcon";
 import { isNullOrEmpty } from "@/utils";
+import { AmenitiesItemProps } from "@/types/exploreTypes";
 
 // Standout section button component / 突出部分按钮组件
 const StandoutSectionButton = () => {
     const {
       theme: { text, border },
     } = useCustomTheme();
-    const { standoutSection, dispatch } = useExploreFilterContext();
+    const { standoutSection, dispatch, cacheFilter } = useExploreFilterContext();
     // Handle standout section button press / 处理突出部分按钮点击
     const handleStandoutSectionButtonPress = (standoutSectionString: string) => {
       dispatch({ type: 'SET_STANDOUT_SECTION', payload: !isNullOrEmpty(standoutSection) ? '' : standoutSectionString});
@@ -35,7 +36,15 @@ const StandoutSectionButton = () => {
       }).start();
     };
 
-    console.log(standoutSection);
+    useEffect(()=>{
+      if(!isNullOrEmpty(cacheFilter)){
+        const newCacheFilter = cacheFilter.find(item=> ['standoutSection'].includes((item.keyWord as string)));
+        if(!isNullOrEmpty(newCacheFilter)){
+          handleStandoutSectionButtonPress(newCacheFilter?.value as string);
+        }
+      }   
+    },[cacheFilter]);
+
     return (
       <Pressable  
         onPress={() => handleStandoutSectionButtonPress('Guest Favorite')}

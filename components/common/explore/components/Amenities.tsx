@@ -1,9 +1,10 @@
 import { useCustomTheme } from "@/context/themeContext";
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
 import { AmenitiesItemIconProps, AmenitiesItemProps, AmenitiesProps } from "@/types/exploreTypes";
 import { useExploreFilterContext } from "@/context/exploreFilterContext";
 import AmenitiesIcon from "./AmenitiesIcon";
+import { isNullOrEmpty } from "@/utils";
 
 // Amenities component / 设施组件
 
@@ -11,7 +12,7 @@ const Amenities = () => {
     const {
       theme: { text },
     } = useCustomTheme();
-    const { checkedAmenities, dispatch } = useExploreFilterContext();
+    const { checkedAmenities,cacheFilter, dispatch } = useExploreFilterContext();
         const [amenities, setAmenities] = useState<AmenitiesProps[]>([
       {
         title: 'Essentials',
@@ -186,6 +187,26 @@ const Amenities = () => {
       },
       [checkedAmenities]
     );
+
+    useEffect(()=>{
+      if(!isNullOrEmpty(cacheFilter)){
+        const newCacheFilter = cacheFilter.filter(item=> ['Essentials','Features','Location','Safety'].includes((item.value as AmenitiesItemProps).parent as string));
+        if(!isNullOrEmpty(newCacheFilter)){
+          newCacheFilter.forEach(item=>{
+            if(item.move){  
+              delete checkedAmenities[item.keyWord];
+            }else{
+              checkedAmenities[item.keyWord] = item.value as AmenitiesItemProps
+            }
+          })
+          dispatch({ 
+            type: 'SET_CHECKED_AMENITIES',
+            payload: checkedAmenities,
+          });
+        }
+      }
+    },[cacheFilter]);
+
   
     return (
       <View style={styles.amenitiesList}>

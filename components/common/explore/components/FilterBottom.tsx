@@ -3,17 +3,21 @@ import { useCustomTheme } from "@/context/themeContext";
 import { useExploreFilterContext } from "@/context/exploreFilterContext";
 import { ExploreFiltersAccessibilityFeatureItemProps, ExploreFiltersAccessibilityFeaturesProps, ExploreFiltersFilterListProps, PropertyTypesProps } from "@/types/exploreTypes";
 import AmenitiesIcon from "./AmenitiesIcon";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import PropertyTypes from "./PropertyTypes";
 import Feature from "./Feature";
+import { isNullOrEmpty } from "@/utils";
 
 // Filter bottom component / 底部筛选组件
 const FilterBottom = () => {
     const {
       theme: { border, text },
     } = useCustomTheme();
-    const { selectedPropertyTypes, selectedAccessibilityFeatures, dispatch } =
+    const { cacheFilter, selectedPropertyTypes, selectedAccessibilityFeatures, dispatch } =
       useExploreFilterContext();
+
+      const [newSelectedPropertyTypeKey,setNewSelectedPropertyTypeKey] = useState<string[]>([]);  
+      const [newSelectedAccessibilityFeatureKey,setNewSelectedAccessibilityFeatureKey] = useState<string[]>([]);  
     // Property types state / 物业类型状态
     const [propertyTypes, setPropertyTypes] = useState<PropertyTypesProps[]>([
       { id: 1, name: 'House', icon: 'home', type: 'MaterialCommunityIcons' },
@@ -82,6 +86,86 @@ const FilterBottom = () => {
       },
       []
     );
+
+    // Update selected property type keys when property types change
+    // 当属性类型改变时更新选中的属性类型键值
+    const updateSelectedKeys = (
+      isEmpty: boolean, 
+      selectedItems: Record<string, any>,
+      setKeys: (keys: string[]) => void
+    ) => {
+      if(isEmpty) {
+        const newKeys = Object.keys(selectedItems);
+        setKeys(newKeys);
+      }
+    };
+    useEffect(()=>{
+      
+      if(!isNullOrEmpty(selectedPropertyTypes)){
+        updateSelectedKeys(
+          isNullOrEmpty(newSelectedPropertyTypeKey),
+          selectedPropertyTypes,
+          setNewSelectedPropertyTypeKey
+        );
+      }
+      if(!isNullOrEmpty(selectedAccessibilityFeatures)){
+
+      updateSelectedKeys(
+        isNullOrEmpty(newSelectedAccessibilityFeatureKey), 
+          selectedAccessibilityFeatures,
+          setNewSelectedAccessibilityFeatureKey
+        );
+      }
+
+    },[selectedPropertyTypes,selectedAccessibilityFeatures]);
+   
+    
+    useEffect(() => {
+      if (isNullOrEmpty(cacheFilter)) return;
+      
+
+      // Handle property type filters
+      const propertyTypeCacheFilter = cacheFilter.filter(item => 
+        newSelectedPropertyTypeKey.includes(item.keyWord as string)
+      );
+
+      if (!isNullOrEmpty(propertyTypeCacheFilter)) {
+        const updatedPropertyTypes = { ...selectedPropertyTypes };
+        propertyTypeCacheFilter.forEach(item => {
+          if (item.move) {
+            delete updatedPropertyTypes[item.keyWord];
+          } else {
+            updatedPropertyTypes[item.keyWord] = item.value as PropertyTypesProps;
+          }
+        });
+        
+        dispatch({
+          type: 'SET_SELECTED_PROPERTY_TYPES', 
+          payload: updatedPropertyTypes
+        });
+      }
+
+      // Handle accessibility feature filters  
+      const accessibilityFeatureCacheFilter = cacheFilter.filter(item =>
+        newSelectedAccessibilityFeatureKey.includes(item.keyWord as string)
+      );
+
+      if (!isNullOrEmpty(accessibilityFeatureCacheFilter)) {
+        const updatedAccessibilityFeatures = { ...selectedAccessibilityFeatures };
+        accessibilityFeatureCacheFilter.forEach(item => {
+          if (item.move) {
+            delete updatedAccessibilityFeatures[item.keyWord];
+          } else {
+            updatedAccessibilityFeatures[item.keyWord] = item.value as ExploreFiltersAccessibilityFeatureItemProps;
+          }
+        });
+
+        dispatch({
+          type: 'SET_ACCESSIBILITY_FEATURES',
+          payload: updatedAccessibilityFeatures
+        });
+      }
+    }, [cacheFilter, newSelectedPropertyTypeKey, newSelectedAccessibilityFeatureKey]);
   
     const filterList: ExploreFiltersFilterListProps[] = useMemo(
       () => [

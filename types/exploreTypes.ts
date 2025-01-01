@@ -27,6 +27,7 @@ interface ExploreListProps {
  * 探索过滤器按钮属性接口
  */
 interface ExploreFiltersButtonProps {
+    cacheFilter:FilterArrayList,
     onFilterPress?: (isPressed: boolean) => void;  // Filter press event handler / 过滤器点击事件处理函数
 }
 
@@ -67,6 +68,7 @@ interface ExploreFiltersBedsBathroomsOnChangeProps {
     title: string;
     maxNumber: number;
     minNumber: number;
+    value: number;
     onChange: (value: number) => void;
 }
 
@@ -88,7 +90,8 @@ interface AmenitiesItemProps{
     id:number,
     name:string,
     icon:string,
-    type:string
+    type:string,
+    parent?:string
 }
 
 interface AmenitiesCheckedProps{
@@ -189,21 +192,55 @@ interface PriceRange {
     leftPrice: number;
     rightPrice: number;
     connectPrice?:string
+    move?:boolean
   }
 
-export type ObjectToList<T> = {
-    keyWord: keyof T;
-    value: T[keyof T];
+  /**
+   * Explore Filter Value Base Props Interface
+   * 探索过滤器值基础属性接口
+   */
+    interface ExploreFilterValueBaseProps {
+    icon?:string,
+    id?:number,
+    name?:string,
+    parent?:string,
+    type?:string,
   };
+
+  /**
+   * Explore Filter Item Props Interface
+   * value:string | number | ExploreFilterValueBaseProps
+   * ExploreFilterValueBaseProps: { 
+   *  icon?:string,
+   *  id?:number,
+   *  name?:string,
+   *  parent?:string,
+   *  move?:boolean,
+   *  type?:string
+   * }
+   * 探索过滤器项目属性接口
+   */
+  export interface ExploreFilterItemProps<T>{
+    keyWord:string,
+    parent?:string,
+    move?:boolean,
+    value:T
+  }
+
+  /**
+   * Filter Value Type
+   * 多类型值 
+   * 过滤器值类型
+   */
+  export type FilterValue = string | number  | ExploreFilterValueBaseProps | PriceRange
+
+  /**
+   * Filter Value List Type
+   * 过滤器值列表类型
+   */
+  export type FilterArrayList = ExploreFilterItemProps<FilterValue>[]
   
-/**
- * Explore Filters Cache Props Interface
- * 探索过滤器缓存属性接口
- */ 
-interface ExploreFiltersCacheProps {
-  keyWord: string;
-  value: any;
-}
+
 
 export type {
     ExploreItemType,
@@ -222,6 +259,4 @@ export type {
     AmenitiesCheckedProps,
     BookingOptionsCheckedProps,
     PriceRange,
-    ExploreFiltersAccessibilityFeaturesCheckedProps,
-    ExploreFiltersCacheProps
-};
+    ExploreFiltersAccessibilityFeaturesCheckedProps};

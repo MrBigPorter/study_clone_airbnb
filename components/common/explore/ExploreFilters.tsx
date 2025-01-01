@@ -22,11 +22,12 @@ import BookingOptions from './components/BookingOptions';
 import StandoutSectionButton from './components/StandoutSectionButton';
 import FilterBottom from './components/FilterBottom';
 import BottomBar from './components/BottomBar';
-
-export default function ExploreFilters() {
+import { isNullOrEmpty } from '@/utils';
+export default function ExploreFilters({ onClose }: { onClose: () => void }) {
   const {
     bedsBathroomsInfo,
     cacheFilter,
+    priceRange,
     dispatch,
   } = useExploreFilterContext();
 
@@ -171,6 +172,7 @@ export default function ExploreFilters() {
   };
 
 
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -211,6 +213,7 @@ export default function ExploreFilters() {
             Nightly prices before fees and taxes
           </Text>
           <PriceRangeSlider
+            value={priceRange}
             onPriceChange={({ leftPrice, rightPrice }) =>
               dispatch({
                 type: 'SET_PRICE_RANGE',
@@ -233,6 +236,7 @@ export default function ExploreFilters() {
             title="Bedrooms"
             maxNumber={10}
             minNumber={0}
+            value={bedsBathroomsInfo.bedrooms}
             onChange={(value) =>
               dispatch({
                 type: 'SET_BEDS_BATHROOMS',
@@ -244,6 +248,7 @@ export default function ExploreFilters() {
             title="Beds"
             maxNumber={10}
             minNumber={0}
+            value={bedsBathroomsInfo.beds}
             onChange={(value) =>
               dispatch({
                 type: 'SET_BEDS_BATHROOMS',
@@ -255,6 +260,7 @@ export default function ExploreFilters() {
             title="Bathrooms"
             maxNumber={10}
             minNumber={0}
+            value={bedsBathroomsInfo.bathrooms}
             onChange={(value) =>
               dispatch({
                 type: 'SET_BEDS_BATHROOMS',
@@ -292,7 +298,7 @@ export default function ExploreFilters() {
         </View>
         <FilterBottom />
       </ScrollView>
-      <BottomBar />
+      <BottomBar onClose={onClose} />
     </View>
   );
 }

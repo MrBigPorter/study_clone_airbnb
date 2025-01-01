@@ -4,18 +4,23 @@ import { View, Text, StyleSheet, Platform, Pressable } from 'react-native';
 // 导入Ionicons图标
 // Import Ionicons icons
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { Surface } from 'react-native-paper';
 import { ExploreFiltersButtonProps } from '@/types/exploreTypes';
+import { useCustomTheme } from '@/context/themeContext';
 // 搜索头部组件
 // Search header component
-export default function SearchHeader({ onFilterPress }:ExploreFiltersButtonProps) {
+export default function SearchHeader({ onFilterPress,cacheFilter }:ExploreFiltersButtonProps) {
+  
   const [isPressed, setIsPressed] = useState<boolean>(false);
-
+  const { theme:{background,border,text} } = useCustomTheme();
   const filterPress = (isPressed: boolean) => {
     setIsPressed(isPressed);
     onFilterPress?.(isPressed);
   };
+
+  const filterCount = cacheFilter.length;
+
   return (
     <View style={styles.searchBar}>
       <Surface
@@ -44,6 +49,13 @@ export default function SearchHeader({ onFilterPress }:ExploreFiltersButtonProps
         <View style={isPressed && styles.activeFilter}>
           <Ionicons name="options" size={24} color="black" />
         </View>
+        {
+          filterCount > 0 && (
+            <View  style={[styles.filterDot, { backgroundColor:background.contrast,borderColor:border.light }]}>
+              <Text style={[styles.filterDotText,{color:text.inverse}]}>{filterCount}</Text>
+            </View>
+          )
+        }
       </Pressable>
     </View>
   );
@@ -120,5 +132,22 @@ const styles = StyleSheet.create({
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  filterDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    zIndex: 1000,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterDotText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    fontFamily: 'mon-sb',
   },
 });
